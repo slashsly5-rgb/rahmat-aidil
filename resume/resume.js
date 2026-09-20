@@ -8,7 +8,12 @@
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const SITE = '../', FB = 'https://www.facebook.com/aidjudigital';
-  const AV = 'avatar.png?v=4'; // bump with index.html when the avatar is re-cropped, so caches refetch
+  const AV = 'avatar.png?v=5'; // bump with index.html when the avatar is re-cropped, so caches refetch
+  // WhatsApp deep link: Malaysian local number -> international, no punctuation (016-772 5496 -> 60167725496)
+  const waNumber = p => { const d = String(p || '').replace(/\D/g, ''); return d.startsWith('0') ? '6' + d : d; };
+  const HELLO = "Hi Dr. Rahmat, I saw your digital resume and would like to talk about a talk / training / AI project.";
+  const waHref = p => `https://wa.me/${waNumber(p)}?text=${encodeURIComponent(HELLO)}`;
+  const mailHref = e => `mailto:${e}?subject=${encodeURIComponent('Enquiry from your digital resume')}&body=${encodeURIComponent(HELLO)}`;
   const platforms = (D.projects && D.projects.platforms) || [], tools = (D.projects && D.projects.tools) || [];
   const sup = (D.academic && D.academic.supervision) || [], jobs = (D.career && D.career.jobs) || [];
   const creds = ((D.credentials && D.credentials.credentials) || []).filter(c => c.year);
@@ -36,12 +41,13 @@
     mail: '<svg viewBox="0 0 24 24"><path d="M3 6h18v12H3z"/><path d="M3 7l9 6 9-6"/></svg>',
     fb: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M13.5 22v-8h2.7l.4-3.2h-3.1V8.8c0-.9.3-1.6 1.6-1.6h1.7V4.4c-.3 0-1.3-.1-2.5-.1-2.5 0-4.1 1.5-4.1 4.2v2.3H7.4V14h2.8v8z"/></svg>',
     check: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l2.4 2.2 3.2-.5 1 3.1 2.9 1.5-1.1 3 1.1 3-2.9 1.5-1 3.1-3.2-.5L12 22l-2.4-2.2-3.2.5-1-3.1-2.9-1.5 1.1-3-1.1-3 2.9-1.5 1-3.1 3.2.5z"/><path d="M8.5 12.2l2.3 2.3 4.7-4.9" fill="none" stroke="#1a1204" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    wa: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.6 0-3.2-.4-4.5-1.3l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.6-6.1c-.3-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.6.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.6-1.2.1-.2 0-.4 0-.5l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3A2.9 2.9 0 0 0 6.7 12a5 5 0 0 0 1 2.2 11.4 11.4 0 0 0 4.4 3.9c1.6.6 2.2.7 3 .6a2.6 2.6 0 0 0 1.7-1.2 2.1 2.1 0 0 0 .1-1.2z"/></svg>',
     spark: '<svg viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg>',
   };
 
   // ---- profile card
   const roles = P.roles || [];
-  const profile = panel('profile', SITE, `
+  const profile = `<div class="p p--profile" style="${at('profile')}">
     <span class="p__brand">${I.fb}<b>facebook</b></span>
     <span class="prof">
       <span class="prof__avatar"><img src="${AV}" alt=""></span>
@@ -60,7 +66,11 @@
       ${c.email ? `<span>✉️ ${esc(c.email)}</span>` : ''}
       <span>🔗 ${esc(FB.replace('https://', ''))}</span>
     </span>
-    <span class="prof__btns"><span class="b b--gold">Visit site</span><span class="b">Message</span><span class="b b--sq">+</span></span>`);
+    <span class="prof__btns">
+      <a class="b b--gold" href="${SITE}">Visit site</a>
+      ${c.phone ? `<a class="b b--wa" href="${waHref(c.phone)}" rel="noopener" target="_blank">${I.wa}Message</a>` : ''}
+      ${c.email ? `<a class="b b--sq" href="${mailHref(c.email)}" aria-label="Email">${I.mail}</a>` : ''}
+    </span></div>`;
 
   // ---- professional dashboard
   const dash = panel('dash', SITE + '#projects', `
@@ -104,7 +114,7 @@
   // ---- collaboration request
   const collab = `<span class="p p--collab" style="${at('collab')}">
     <span class="row"><span class="dot"></span><span><small>Collaboration request</small><b>from your organisation</b></span></span>
-    <span class="prof__btns">${c.email ? `<a class="b b--gold" href="mailto:${esc(c.email)}">Email</a>` : ''}${c.linkedin ? `<a class="b" href="${esc(c.linkedin)}" rel="noopener" target="_blank">LinkedIn</a>` : ''}</span></span>`;
+    <span class="prof__btns">${c.phone ? `<a class="b b--wa" href="${waHref(c.phone)}" rel="noopener" target="_blank">${I.wa}WhatsApp</a>` : ''}${c.email ? `<a class="b" href="${mailHref(c.email)}">Email</a>` : ''}${c.linkedin ? `<a class="b" href="${esc(c.linkedin)}" rel="noopener" target="_blank">LinkedIn</a>` : ''}</span></span>`;
 
   // ---- facebook badge
   const fb = panel('fb', FB, `<span class="fbbadge">${I.fb}</span>`, ' p--bare');
@@ -124,7 +134,8 @@
   const likes = panel('likes', SITE + '#credentials', `<span class="reacts reacts--one">${I.heart}<b>${esc(talksStat)}</b></span>`, ' p--bare');
 
   // ---- new message
-  const msg = panel('msg', SITE + '#contact', `<span class="row">${I.mail}<span><small>New message</small><b>Let's collaborate!</b></span></span>`);
+  const msg = panel('msg', c.phone ? waHref(c.phone) : (c.email ? mailHref(c.email) : SITE + '#contact'),
+    `<span class="row">${c.phone ? I.wa : I.mail}<span><small>${c.phone ? 'WhatsApp me' : 'New message'}</small><b>Let's collaborate!</b></span></span>`);
 
   // ---- growth chart: cumulative roles per year
   const years = jobs.map(j => +String(j.start).slice(0, 4)).filter(Boolean).sort((a, b) => a - b);
