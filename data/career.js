@@ -93,6 +93,12 @@ window.DATA.career = {
       title: 'ELITE@UM Expert',
       org: 'Universiti Malaya',
     },
+    {
+      title: 'Honorary Adjunct Faculty',
+      org: 'Lovely Professional University (LPU), India',
+      start: '2024',
+      end: 'Present',
+    },
   ],
   education: [
     {

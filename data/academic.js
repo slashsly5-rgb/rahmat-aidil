@@ -13,6 +13,8 @@ window.DATA.academic = {
     { id: 'fraud', label: 'Fraud prevention' },
     { id: 'hr-data', label: 'HR & workforce data' },
     { id: 'energy-iot', label: 'Energy & IoT' },
+    { id: 'wellbeing', label: 'Health & wellbeing tech' },
+    { id: 'ageing-tech', label: 'Ageing & inclusive tech' },
   ],
   supervision: [
     {
@@ -77,12 +79,29 @@ window.DATA.academic = {
       status: 'Ongoing',
       areas: ['hr-data'],
     },
+    // Titles added 2026-09-21 from the 2026 CV in "Info Old and New".
+    {
+      title: 'Determinants of Ecosystem-Based Super-App Adoption Among Older Adults in Sarawak, Malaysia: An Extended UTAUT2 Model with Trust in AI as a Mediator',
+      level: 'PhD',
+      role: 'Main supervisor',
+      status: 'Ongoing',
+      areas: ['ai-adoption', 'ageing-tech'],
+    },
+    {
+      title: 'Factors Influencing AI-Chatbot Adoption Intention for Mental Health Support and Their Effects on Psychological Well-Being Among University Students in Malaysia',
+      level: 'PhD',
+      role: 'Main supervisor',
+      status: 'Ongoing',
+      areas: ['ai-adoption', 'wellbeing'],
+    },
     // Added 2026-09-19 from the OCULUS postgraduate supervisor list (owner-supplied screenshot).
     // Titles not registered yet; add a `title:` line when known. No names here: public site.
     { level: 'PhD', status: 'Ongoing', role: 'Main supervisor', areas: [] },
-    { level: 'PhD', status: 'Ongoing', role: 'Main supervisor', areas: [] },
-    { level: 'PhD', status: 'Ongoing', role: 'Main supervisor', areas: [] },
     { level: 'PhD', status: 'Ongoing', role: 'Co-supervisor', areas: [] },
+    // Master's candidates listed in the 2025 UTS appraisal; titles not registered yet.
+    { level: 'Master', status: 'Ongoing', role: 'Main supervisor', areas: [] },
+    { level: 'Master', status: 'Ongoing', role: 'Main supervisor', areas: [] },
+    { level: 'Master', status: 'Ongoing', role: 'Main supervisor', areas: [] },
   ],
   publications: [
     {

@@ -304,5 +304,162 @@ window.DATA.credentials = {
     {
       title: 'Digital Marketing Course — Kolej Komuniti Betong',
     },
+    // ---- imported 2026-09-21 from the UTS academic staff appraisal forms (2024 & 2025) ----
+    {
+      title: 'Trainer, "Boost Bisnismu Dengan AI" — workshop for an Indonesian training consultancy',
+      date: '2024',
+    },
+    {
+      title: 'Trainer, "Juarai Shopee Melalui Manajemen Data & AI" — Hends Consulting, Indonesia',
+      date: '2024',
+    },
+    {
+      title: 'Trainer, AI in Business Workshop',
+      org: 'UTS, Sarawak Foundation of Scholars (SFS) and Techbizfest',
+      date: '2024',
+    },
+    {
+      title: 'Trainer, Program Latihan dan Pembangunan ICT Luar Bandar 2024 (SMART)',
+      org: 'Ministry of Food Industry, Commodity and Regional Development Sarawak (M-FICORD)',
+      date: '2024',
+    },
+    {
+      title: 'Speaker, knowledge-sharing session on digital and AI adoption',
+      org: 'Pejabat Setiausaha Kewangan Negeri Sarawak — Bahagian Pematuhan Kewangan dan Pengurusan Aset Sarawak',
+      date: '2024',
+    },
+    {
+      title: 'Facilitator, Data Management System Development Workshop',
+      org: 'Pejabat Setiausaha Negeri Sarawak — Jabatan Pengurusan Aset dan Kewangan Sarawak',
+      date: '2024',
+    },
+    {
+      title: 'Trainer, Business Information Talk "Tiktokpreneur — Rahsia Pendapatan Melalui Platform Digital"',
+      date: '2024',
+    },
+    {
+      title: 'Trainer, "Bengkel AI dan ChatGPT Dalam Menyokong Tugas Guru" — khusus untuk warga pendidik',
+      date: '2024',
+    },
+    {
+      title: 'Trainer, "Empowering Sarawak’s Homestay Industry Through Digitalization"',
+      org: 'Ministry of Tourism, Creative Industry and Performing Arts Sarawak',
+      date: '2024',
+    },
+    {
+      title: 'Trainer, digital technology and AI application for peladang and pemborong',
+      org: 'Lembaga Lada Malaysia',
+      place: 'Miri',
+      date: '2024',
+    },
+    {
+      title: 'Trainer, Program Pembangunan Digital Learning Kolej Komuniti Malaysia',
+      place: 'Betong',
+      date: '2024',
+    },
+    {
+      title: 'Moderator, UTS Postgraduate Sharing Session "My Thesis" 2024',
+      org: 'University of Technology Sarawak',
+      date: '2024',
+    },
+    {
+      title: 'Speaker, High Aptitude Meeting and Discourse (HAMeeD) Programme',
+      org: 'Pustaka Negeri Sarawak',
+      place: 'Sibu',
+      date: '2024',
+    },
+    {
+      title: 'Speaker, PowerPoint Mastery Talk',
+      org: 'JCI',
+      date: '2024',
+    },
+    {
+      title: 'Speaker (representing the Vice-Chancellor), Sistem Pesanan Kerjaya (SPEAK) Training and Awareness',
+      org: 'MEITD',
+      place: 'Bintulu',
+      date: '2024',
+    },
+    {
+      title: 'International judge, International Student Competition',
+      org: 'Universitas Bangka Belitung, Indonesia',
+      date: '2024',
+    },
+    {
+      title: 'Speaker, Sustainable Fresh Fruit Bunch (FFB) Harvesting Techniques in the Oil Palm Industry',
+      org: 'Methodist Pilley Institute (MPI)',
+      date: '2024',
+    },
+    {
+      title: 'Speaker, "How to Fully Benefit from AI in Education"',
+      org: 'UTS and UCIL',
+      date: '2024',
+    },
+    {
+      title: 'Speaker, "Ceramah Motivasi dan Kerjaya Pada Era Kecerdasan Buatan"',
+      org: 'Sekolah Kebangsaan Nanga Meluan, Julau',
+      date: '2024',
+    },
+    {
+      title: 'Speaker (representing the Vice-Chancellor), Bicara Eksekutif and the opening of Persidangan Guru Muda Sarawak (PGMS) 2024',
+      date: '2024',
+    },
+    {
+      title: 'Coordinator, Be Digital Bootcamp Programme 2024',
+      org: 'Petronas',
+      date: '2024',
+    },
+    {
+      title: 'Founded the Sarawak e-Incubation Hub (SeIH) to build student practical skills in digital entrepreneurship and applied AI',
+      org: 'University of Technology Sarawak',
+      date: '2024',
+    },
+    {
+      title: 'Emcee, International Participatory Design Conference (PDC) 2024',
+      date: '2024',
+    },
+    {
+      title: 'Protocol team and emcee, STEM Trailblazer',
+      date: '2024',
+    },
+    {
+      title: 'Wrote the Pro-Chancellor’s speech for the UTS 9th Convocation Ceremony',
+      org: 'University of Technology Sarawak',
+      date: '2024',
+    },
+    {
+      title: 'Produced the materials and emcee script for the PMQS Appreciation Dinner 2024',
+      date: '2024',
+    },
+    {
+      title: 'Panel member, social study on online safety',
+      org: 'Bahagian Hal Ehwal Undang-Undang, Jabatan Perdana Menteri Sarawak',
+      date: '2024',
+    },
+    {
+      title: 'Participant, Focus Group Discussion (FGD) Sarawak on Hala Tuju Penyelidikan KPT dalam RMK-13',
+      org: 'Universiti Malaya',
+      date: '2024',
+    },
+    {
+      title: 'Presented an AI-powered data management system to the Office of the Deputy Premier of Sarawak',
+      date: '2024',
+    },
+    {
+      title: 'Interviewed by Jabatan Komunikasi Masyarakat (J-KOM) on the 2025 Budget announcement',
+      date: '2024',
+    },
+    {
+      title: 'Interviewed by the Malaysian press on the Sarawak Premier’s modern waste management initiative',
+      date: '2024',
+    },
+    {
+      title: 'Speaker, SCaTFAIR Career Talk',
+      org: 'MEITD, TEGAS, PERKESO and UTS',
+      date: '2024',
+    },
+    {
+      title: 'Produced promotional videos for all four SBM degree programmes — Degree Courses Introduction Programme, SFS',
+      date: '2024',
+    },
   ],
 };
