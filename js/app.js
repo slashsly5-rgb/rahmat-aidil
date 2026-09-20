@@ -704,21 +704,28 @@
 
   }
 
-  // ---------- credentials: infographic stage (rendered clip) + HTML overlay ----------
-  // The clip (media/cred-stage.mp4, 16:9) has three holographic screens feeding a central engine, which feeds
-  // six glass pillars. Overlay coordinates below are % of the frame; keep them in sync if the clip is re-rendered.
-  const STAGE = {
-    tabs: [{ x: 25.8, y: 3.2 }, { x: 49.9, y: 2.6 }, { x: 73.4, y: 3.2 }],   // blank label tabs above the screens
-    plate: { x: 50, y: 46 },                                                 // blank plate on the engine
-    chips: [{ x: 21, y: 55 }, { x: 79, y: 55 }],                             // HUD chips either side of the engine base
-    rings: [15.0, 29.0, 42.8, 57.2, 70.8, 85.0], ringY: 68, ringD: 4.9,      // icon holders
-    pillar: { y: 73 },                                                        // top of the glass pillar interiors (x from rings)
-  };
+  // ---------- credentials: cards orbiting the bobblehead ----------
+  // Each card sits at a % position on the stage, tilted in 3D. `d` is its depth: it scales the
+  // float distance and the pointer parallax, so near cards travel further than far ones.
+  const ORBIT = [
+    { x: 7, y: 5, w: 30, rot: 8, d: 1.00, face: 'transport' },
+    { x: 60, y: 2, w: 30, rot: -9, d: 0.72, face: 'wave' },
+    { x: 2, y: 34, w: 29, rot: 11, d: 1.18, face: 'wave' },
+    { x: 65, y: 30, w: 30, rot: -6, d: 0.85, face: 'transport' },
+    { x: 8, y: 63, w: 31, rot: 6, d: 0.92, face: 'transport' },
+    { x: 58, y: 60, w: 31, rot: -11, d: 1.22, face: 'wave' },
+  ];
+  // Loose widgets that drift with the cards, like the reference: an equaliser and a bare waveform.
+  const MOTES = [
+    { cls: 'eq', x: 37, y: 3, d: 0.6 },
+    { cls: 'wave', x: 56, y: 20, d: 1.05 },
+    { cls: 'eq', x: 34, y: 76, d: 0.8 },
+  ];
   function renderCredentials() {
     const C = DATA.credentials;
     const el = document.getElementById('credentials');
     if (!C) { hideSection(el, 'credentials'); return; }
-    const creds = (C.credentials || []).filter(c => c.year).slice(0, STAGE.rings.length); // dated trainer/TVET credentials (ELITE@UM lives in Academic)
+    const creds = (C.credentials || []).filter(c => c.year).slice(0, ORBIT.length); // dated trainer/TVET credentials (ELITE@UM lives in Academic)
     const ICON = {
       mic: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"/>',
       cart: '<path d="M3 4h2l2.4 11h10.2L20 7H7"/><circle cx="9" cy="19" r="1.5"/><circle cx="16" cy="19" r="1.5"/>',
@@ -776,53 +783,87 @@
         ${ordered.length > LEAD ? `<button class="btn btn--ghost talks__more" type="button" aria-expanded="false">Show all ${ordered.length}</button>` : ''}
       </div>` : '';
 
-    const tabs = (C.feeders || []).slice(0, 3).map((f, i) => `<span class="st__tab" style="${at(STAGE.tabs[i].x, STAGE.tabs[i].y)};--i:${i}">${esc(f.label)}</span>`).join('');
-    const rings = creds.map((c, i) => `<span class="st__ring" style="${at(STAGE.rings[i], STAGE.ringY)};--i:${i};--hue:${HUES[i]}">${svgIcon(c.icon)}</span>`).join('');
-    const pillars = creds.map((c, i) => `
-      <div class="st__pillar" style="${at(STAGE.rings[i], STAGE.pillar.y)};--i:${i};--hue:${HUES[i]}">
-        <b class="st__title">${esc(c.short || c.title)}</b>
-        <span class="st__desc">${esc(c.org || c.issuer)}</span>
-        <b class="st__stat" data-count="${esc(c.year)}">${esc(c.year)}</b>
-        <span class="st__cap">${esc(cap(c))}</span>
-      </div>`).join('');
+    const bars = (n, seed) => Array.from({ length: n }, (_, i) =>
+      `<i style="--h:${28 + ((seed * 7 + i * 31) % 64)}%;--i:${i}"></i>`).join('');
+    const GLYPH = {
+      prev: '<path d="M18 5v14L8 12zM6 5v14"/>',
+      next: '<path d="M6 5v14l10-7zM18 5v14"/>',
+      play: '<path d="M8 5.5v13l11-6.5z"/>',
+    };
+    const glyph = (k, cls) => `<svg class="${cls}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${GLYPH[k]}</svg>`;
+
+    // A credential rendered as one of the floating player cards.
+    const card = (c, i) => {
+      const o = ORBIT[i];
+      return `<article class="ocard" style="--x:${o.x};--y:${o.y};--w:${o.w};--rot:${o.rot};--d:${o.d};--hue:${HUES[i]};--i:${i}">
+        <div class="ocard__top">
+          <span class="ocard__art">${svgIcon(c.icon)}</span>
+          <span class="ocard__meta">
+            <b class="ocard__title">${esc(c.short || c.title)}</b>
+            <span class="ocard__sub">${esc(c.org || c.issuer)}</span>
+          </span>
+          <span class="ocard__badge" title="${esc(cap(c))}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+          </span>
+        </div>
+        ${o.face === 'transport' ? `<div class="ocard__deck">
+            ${glyph('prev', 'ocard__skip')}
+            <span class="ocard__play">${glyph('play', '')}</span>
+            ${glyph('next', 'ocard__skip')}
+            <span class="ocard__year">${esc(c.year)}</span>
+          </div>
+          <span class="ocard__track"><i style="--p:${52 + i * 6}%"></i></span>`
+        : `<div class="ocard__deck ocard__deck--wave">
+            <span class="ocard__play ocard__play--sm">${glyph('play', '')}</span>
+            <span class="ocard__wave">${bars(22, i + 3)}</span>
+            <span class="ocard__year">${esc(c.year)}</span>
+          </div>`}
+      </article>`;
+    };
+
+    const motes = MOTES.map((m, i) => `<span class="mote mote--${m.cls}" style="--x:${m.x};--y:${m.y};--d:${m.d};--i:${i}" aria-hidden="true">${m.cls === 'eq' ? bars(7, i + 1) : bars(26, i + 9)}</span>`).join('');
+
     const list = creds.map((c, i) => `
       <li class="cl" style="--hue:${HUES[i]}"><span class="cl__icon">${svgIcon(c.icon)}</span>
         <div><b>${esc(c.short || c.title)}</b><span class="muted small">${esc(c.org || c.issuer)} · ${esc(cap(c))}</span></div><b class="cl__year">${esc(c.year)}</b></li>`).join('');
 
     el.innerHTML = head('credentials', 'Credentials & Talks', 'Certified, invited, on stage') +
-      `<div class="stage">
-        <video class="stage__clip" muted loop playsinline preload="none" poster="media/cred-stage.jpg" aria-hidden="true"></video>
-        <div class="stage__ui">
-          ${tabs}
-          <span class="st__plate" style="${at(STAGE.plate.x, STAGE.plate.y)}">${esc(E.label)}</span>
-          <span class="st__chip" style="${at(STAGE.chips[0].x, STAGE.chips[0].y)};--i:0"><b>${esc(E.stat)}</b>${esc(E.caption)}</span>
-          <span class="st__chip st__chip--r" style="${at(STAGE.chips[1].x, STAGE.chips[1].y)};--i:1"><b>${(C.feeders || []).map(f => esc(f.label)).join(' · ')}</b>accredited trainer &amp; TVET verifier</span>
-          ${rings}${pillars}
+      `<div class="orbit">
+        <div class="orbit__glow" aria-hidden="true"></div>
+        <div class="orbit__space">
+          <span class="orbit__spot" aria-hidden="true"></span>
+          <img class="orbit__figure" src="media/figure-trim.png" alt="" width="478" height="672" loading="lazy" decoding="async">
+          ${creds.map(card).join('')}
+          ${motes}
         </div>
+        <p class="orbit__cap"><b>${esc(E.stat)}</b> ${esc(E.caption)} · ${(C.feeders || []).map(f => esc(f.label)).join(' · ')}</p>
       </div>
       <ol class="cred-list">${list}</ol>
       ${catalogueHTML}
       ${talksHTML}`;
 
-    // Clip playback (poster stays when autoplay is blocked or motion is reduced); pause off-screen.
-    const clip = el.querySelector('.stage__clip'), stage = el.querySelector('.stage');
-    if (!reduced) {
-      clip.innerHTML = '<source src="media/cred-stage.mp4" type="video/mp4">';
-      clip.preload = 'auto'; clip.load();
-      new IntersectionObserver(([e]) => { e.isIntersecting ? clip.play().catch(() => {}) : clip.pause(); }).observe(stage);
-    }
-    // Entrance + count-up when scrolled into view
+    const orbit = el.querySelector('.orbit'), space = el.querySelector('.orbit__space');
     new IntersectionObserver(([e], io) => {
       if (!e.isIntersecting) return; io.disconnect();
-      stage.classList.add('is-in');
-      if (reduced) return;
-      el.querySelectorAll('.st__stat').forEach((n, i) => {
-        const to = +n.dataset.count; if (!to) return;
-        const from = to - 40, t0 = performance.now() + 600 + i * 120;
-        (function tick(now) { const k = Math.min(1, Math.max(0, (now - t0) / 1100)); n.textContent = Math.round(from + (to - from) * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(tick); })(t0);
-      });
-    }, { threshold: .3 }).observe(stage);
+      orbit.classList.add('is-in');
+    }, { threshold: .2 }).observe(orbit);
 
+    // Pointer parallax: the stage keeps --px/--py in the -1..1 range, each card multiplies by its depth.
+    if (!reduced && matchMedia('(hover: hover)').matches) {
+      let raf = 0;
+      orbit.addEventListener('pointermove', ev => {
+        if (raf) return;
+        raf = requestAnimationFrame(() => {
+          raf = 0;
+          const r = orbit.getBoundingClientRect();
+          space.style.setProperty('--px', ((ev.clientX - r.left) / r.width * 2 - 1).toFixed(3));
+          space.style.setProperty('--py', ((ev.clientY - r.top) / r.height * 2 - 1).toFixed(3));
+        });
+      });
+      orbit.addEventListener('pointerleave', () => {
+        space.style.setProperty('--px', 0); space.style.setProperty('--py', 0);
+      });
+    }
     const more = el.querySelector('.talks__more'), rest = el.querySelector('.talks__list--more');
     more && more.addEventListener('click', () => {
       const open = rest.hidden;
