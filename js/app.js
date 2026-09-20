@@ -334,7 +334,7 @@
         </g>`;
       });
       const hl = wrap2(h.name, 14);
-      nodes += `<g class="hm__hub" data-hub="${hi}" style="color:${h.color}" transform="translate(${h.x},${h.y})">
+      nodes += `<g class="hm__hub" id="t-${L.slug(h.name)}" data-hub="${hi}" style="color:${h.color}" transform="translate(${h.x},${h.y})">
         <rect class="hm__hub-glow" x="${-HUB_W / 2 - 8}" y="${-HUB_H / 2 - 8}" width="${HUB_W + 16}" height="${HUB_H + 16}" rx="18"/>
         <rect class="hm__hub-box" x="${-HUB_W / 2}" y="${-HUB_H / 2}" width="${HUB_W}" height="${HUB_H}" rx="13"/>
         <path class="hm__tile-shine" d="M${-HUB_W / 2 + 8},${-HUB_H / 2 + 12} q0,-7 8,-7 h${HUB_W - 32} q8,0 8,7 v5 h-${HUB_W - 16} z"/>
@@ -452,7 +452,7 @@
         p.industry && `<b>Industry:</b> ${esc(p.industry)}`,
         [p.status, p.clientType && `${p.clientType} client`].filter(Boolean).map(esc).join(' · '),
       ].filter(Boolean);
-      return `<li class="flow__row" style="--accent:${FLOW_ACCENTS[i % FLOW_ACCENTS.length]}">
+      return `<li class="flow__row" id="p-${L.slug(p.name)}" style="--accent:${FLOW_ACCENTS[i % FLOW_ACCENTS.length]}">
         <div class="flow__medal">
           <span class="flow__num" aria-hidden="true">${i + 1}</span>
           <span class="flow__ring flow__ring--a" aria-hidden="true"></span><span class="flow__ring flow__ring--b" aria-hidden="true"></span>
@@ -799,10 +799,22 @@
   // afterwards, so the browser's own hash jump lands on stale positions. Re-apply it once things settle.
   let lenis = null;
   const NAV_GAP = 16; // the floating nav sits 12px from the top
+  // #projects/p/<slug> -> platform row, #projects/t/<slug> -> tool group; unknown slugs fall back to the section.
+  function hashTarget() {
+    const raw = decodeURIComponent((location.hash || '').slice(1));
+    const m = raw.match(/^projects\/(p|t)\/(.+)$/);
+    if (!m) return { el: raw && document.getElementById(raw), hit: null };
+    const item = document.getElementById(`${m[1]}-${m[2]}`);
+    return { el: item || document.getElementById('projects'), hit: item };
+  }
+  let hitTimer = 0;
   function gotoHash(smooth) {
-    const id = decodeURIComponent((location.hash || '').slice(1));
-    const el = id && document.getElementById(id);
+    const { el, hit } = hashTarget();
     if (!el || el.hidden) return;
+    if (hit) { // light the exact item up for a moment
+      hit.classList.add('is-in', 'is-hit');
+      clearTimeout(hitTimer); hitTimer = setTimeout(() => hit.classList.remove('is-hit'), 3000);
+    }
     if (lenis) { lenis.scrollTo(el, { offset: -NAV_GAP, immediate: !smooth }); return; }
     const y = el.getBoundingClientRect().top + window.scrollY - NAV_GAP;
     window.scrollTo({ top: Math.max(0, y), behavior: smooth ? 'smooth' : 'auto' });
@@ -822,7 +834,8 @@
     document.documentElement.style.scrollBehavior = 'auto';
     document.addEventListener('click', e => {
       const a = e.target.closest('a[href^="#"]'); if (!a || !a.hash) return;
-      const target = document.querySelector(a.hash); if (!target) return;
+      let target = null; try { target = document.querySelector(a.hash); } catch (_) { /* deep-link hash, let hashchange handle it */ }
+      if (!target) return;
       e.preventDefault();
       lenis.scrollTo(target, { offset: -NAV_GAP });
       if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');

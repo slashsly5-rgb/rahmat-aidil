@@ -412,6 +412,13 @@ a { color: inherit; }
   .hm__group li b { color: var(--text); font-size: 14px; }
 }
 
+/* deep-link landing: the linked platform row / tool group flares for a moment */
+.flow__row.is-hit .flow__panel { animation: hit-flare 3s ease-out; }
+.flow__row.is-hit .flow__disc { animation: hit-flare 3s ease-out; border-radius: 50%; }
+@keyframes hit-flare { 0%, 60% { box-shadow: 0 0 0 4px #fff, 0 0 60px 12px color-mix(in srgb, var(--accent) 80%, #fff); } 100% { box-shadow: 0 0 22px color-mix(in srgb, var(--accent) 45%, transparent); } }
+.hm__hub.is-hit .hm__hub-box { animation: hit-hub 3s ease-out; }
+@keyframes hit-hub { 0%, 60% { stroke: #fff; stroke-width: 6; } }
+
 /* ---------- academic ---------- */
 .small { font-size: 13px; }
 .acad2 { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 36px; align-items: start; }

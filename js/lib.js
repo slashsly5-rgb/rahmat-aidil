@@ -92,7 +92,10 @@
     return errors;
   }
 
-  const LIB = { esc, parseDate, isPast, splitByDate, activeNow, uniqueValues, matchesFilters, countBy, resolveStat, validate };
+  // URL-safe id from a name: 'Sentinel — Fraud Intelligence' -> 'sentinel-fraud-intelligence' (deep links, element ids)
+  const slug = s => String(s || '').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+
+  const LIB = { esc, parseDate, isPast, splitByDate, activeNow, uniqueValues, matchesFilters, countBy, resolveStat, validate, slug };
   if (typeof module !== 'undefined' && module.exports) module.exports = LIB;
   else root.LIB = LIB;
 })(typeof window !== 'undefined' ? window : globalThis);

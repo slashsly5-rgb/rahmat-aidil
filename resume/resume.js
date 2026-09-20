@@ -1,14 +1,14 @@
 // site/resume/resume.js — digital-resume poster: floating gold glass panels around the seated figure.
 // Every panel is a link into the main site. Data comes from ../data/*.js (nothing duplicated here).
 (function () {
-  const { esc, countBy } = window.LIB;
+  const { esc, countBy, slug } = window.LIB;
   const D = window.DATA || {};
   const P = D.profile, ui = document.getElementById('ui');
   if (!P || !ui) return;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const SITE = '../', FB = 'https://www.facebook.com/aidjudigital';
-  const AV = 'avatar.png?v=10'; // bump with index.html when the avatar is re-cropped, so caches refetch
+  const AV = 'avatar.png?v=11'; // bump with index.html when the avatar is re-cropped, so caches refetch
   // WhatsApp deep link: Malaysian local number -> international, no punctuation (016-772 5496 -> 60167725496)
   const waNumber = p => { const d = String(p || '').replace(/\D/g, ''); return d.startsWith('0') ? '6' + d : d; };
   const HELLO = "Hi Dr. Rahmat, I saw your digital resume and would like to talk about a talk / training / AI project.";
@@ -25,10 +25,10 @@
 
   // Panel positions as % of the 4:5 poster (x = left edge, y = top edge, w = width). Tune here if the scene changes.
   const POS = {
-    profile: { x: 3, y: 2.5, w: 60 },   dash: { x: 66, y: 4, w: 31 },       insights: { x: 66, y: 19.5, w: 31 },
-    recog: { x: 66, y: 34.5, w: 31 },    trend: { x: 66, y: 45.5, w: 31 },   reacts: { x: 66, y: 56, w: 31 },
-    collab: { x: 66, y: 62, w: 31 },     fb: { x: 83, y: 74, w: 12 },        follower: { x: 3, y: 45, w: 24 },
-    thumbs: { x: 3, y: 56, w: 30 },      msg: { x: 3, y: 68, w: 24 },         growth: { x: 3, y: 74.5, w: 27 },
+    profile: { x: 3, y: 2.5, w: 60 },   dash: { x: 67, y: 4, w: 30 },       insights: { x: 67, y: 25, w: 30 },
+    recog: { x: 67, y: 40, w: 30 },      trend: { x: 67, y: 51, w: 30 },     reacts: { x: 67, y: 61.5, w: 30 },
+    collab: { x: 67, y: 67, w: 30 },     fb: { x: 83, y: 76.5, w: 12 },      msg: { x: 67, y: 88, w: 30 },
+    builds: { x: 3, y: 40, w: 31 },      toolbox: { x: 3, y: 61.5, w: 23 },   growth: { x: 3, y: 78.5, w: 27 },
   };
   const at = k => `left:${POS[k].x}%;top:${POS[k].y}%;width:${POS[k].w}%`;
   const panel = (k, href, body, extra = '') => `<a class="p p--${k}${extra}" style="${at(k)}" href="${esc(href)}"${/^https?:/.test(href) ? ' rel="noopener" target="_blank"' : ''}>${body}</a>`;
@@ -40,6 +40,11 @@
     mail: '<svg viewBox="0 0 24 24"><path d="M3 6h18v12H3z"/><path d="M3 7l9 6 9-6"/></svg>',
     fb: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M13.5 22v-8h2.7l.4-3.2h-3.1V8.8c0-.9.3-1.6 1.6-1.6h1.7V4.4c-.3 0-1.3-.1-2.5-.1-2.5 0-4.1 1.5-4.1 4.2v2.3H7.4V14h2.8v8z"/></svg>',
     check: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l2.4 2.2 3.2-.5 1 3.1 2.9 1.5-1.1 3 1.1 3-2.9 1.5-1 3.1-3.2-.5L12 22l-2.4-2.2-3.2.5-1-3.1-2.9-1.5 1.1-3-1.1-3 2.9-1.5 1-3.1 3.2.5z"/><path d="M8.5 12.2l2.3 2.3 4.7-4.9" fill="none" stroke="#1a1204" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    cam: '<svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>',
+    chart: '<svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>',
+    book: '<svg viewBox="0 0 24 24"><path d="M4 4h7a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H4z"/><path d="M20 4h-7a3 3 0 0 0-3 3v13a2 2 0 0 1 2-2h8z"/></svg>',
+    mic: '<svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"/></svg>',
+    mega: '<svg viewBox="0 0 24 24"><path d="M3 10v4h3l7 4V6l-7 4z"/><path d="M16 9a4 4 0 0 1 0 6"/></svg>',
     dl: '<svg viewBox="0 0 24 24"><path d="M12 3v11"/><path d="M8 11l4 4 4-4"/><path d="M4 19h16"/></svg>',
     wa: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.6 0-3.2-.4-4.5-1.3l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.6-6.1c-.3-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.6.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.6-1.2.1-.2 0-.4 0-.5l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3A2.9 2.9 0 0 0 6.7 12a5 5 0 0 0 1 2.2 11.4 11.4 0 0 0 4.4 3.9c1.6.6 2.2.7 3 .6a2.6 2.6 0 0 0 1.7-1.2 2.1 2.1 0 0 0 .1-1.2z"/></svg>',
     spark: '<svg viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg>',
@@ -84,13 +89,16 @@
     </span></div>`;
 
   // ---- professional dashboard
+  const techCount = countBy(platforms.flatMap(pl => (pl.tech || []).map(t => ({ t }))), 't').sort((a, b) => b[1] - a[1]);
   const dash = panel('dash', SITE + '#projects', `
     <span class="p__head">Professional dashboard<i>${seeAll}</i></span>
     <span class="tiles">
       <span class="tile"><small>AI platforms</small><b data-count="${platforms.length}">${platforms.length}</b><em>deployed</em></span>
       <span class="tile"><small>Agents &amp; tools</small><b data-count="${tools.length}">${tools.length}</b><em>custom built</em></span>
       <span class="tile"><small>Talks</small><b>${esc(talksStat)}</b><em>delivered</em></span>
-    </span>`);
+    </span>
+    <span class="caps">${techCount.map(([t, n]) => `<span class="cap"><b>${n}</b>${esc(t.toLowerCase())}</span>`).join('')}</span>
+    <span class="feed"><i class="feed__dot"></i><span class="feed__txt" data-feed></span></span>`);
 
   // ---- audience insights: platforms by sector + supervision donut
   const sectors = countBy(platforms, 'sector').sort((a, b) => b[1] - a[1]).slice(0, 5);
@@ -130,16 +138,26 @@
   // ---- facebook badge
   const fb = panel('fb', FB, `<span class="fbbadge">${I.fb}</span>`, ' p--bare');
 
-  // ---- new follower -> new role
-  const latest = jobs.slice().sort((a, b) => String(b.start).localeCompare(String(a.start)))[0];
-  const follower = panel('follower', SITE + '#career', `
-    <span class="row"><span class="prof__avatar prof__avatar--s"><img src="${AV}" alt=""></span><span><small>New role</small><b>${esc(latest ? latest.title : '')}</b><em>${esc(latest ? `${latest.org} · since ${latest.start}` : '')}</em></span></span>
-    <span class="b b--gold b--xs">View career</span>`);
+  // ---- featured builds: first deployed platform per sector, in this priority (edit to override; names also work)
+  const FLAGSHIP_ORDER = ['Enterprise', 'HR', 'Legal', 'Government'];
+  const flagships = FLAGSHIP_ORDER.map(k => platforms.find(pl => pl.status === 'Deployed' && (pl.sector === k || pl.name === k))).filter(Boolean).slice(0, 4);
+  const firstSentence = t => String(t || '').split(/(?<=\.)\s/)[0].replace(/\.$/, '');
+  const builds = `<div class="p p--builds" style="${at('builds')}">
+    <span class="p__head">Featured builds<a class="pill" href="${SITE}#projects">See all ${platforms.length}</a></span>
+    <span class="bgrid">${flagships.map(pl => `
+      <a class="build" href="${SITE}#projects/p/${slug(pl.name)}" style="background-image:url('../media/sectors/${esc(String(pl.sector || 'enterprise').toLowerCase())}.jpg')">
+        <b>${esc(pl.name)}</b><small>${[pl.sector, ...(pl.tech || []).slice(0, 2)].filter(Boolean).map(esc).join(' \u00b7 ')}</small>
+        <em>${esc(firstSentence(pl.industry || pl.summary))}</em></a>`).join('')}</span></div>`;
 
-  // ---- portfolio thumbnails
-  const pick = platforms.filter(p => p.status === 'Deployed').slice(0, 3);
-  const thumbs = panel('thumbs', SITE + '#projects', `
-    <span class="thumbs">${pick.map(p => `<span class="thumb" style="background-image:url('../media/sectors/${esc(String(p.sector || 'enterprise').toLowerCase())}.jpg')"><b>${esc(p.name)}</b><small>${esc(p.sector || '')}</small></span>`).join('')}</span>`, ' p--bare');
+  // ---- AI toolbox: one tile per tool group
+  const GROUP_ICON = { 'Image & Video Studio': 'cam', 'Marketing & Content': 'mega', 'Chat & Service Agents': 'chat', 'Data & Insights': 'chart', 'Voice & Audio': 'mic', 'Productivity & Learning': 'book' };
+  const groups = countBy(tools, 'group').sort((a, b) => b[1] - a[1]);
+  const toolbox = `<div class="p p--toolbox" style="${at('toolbox')}">
+    <span class="p__head"><b>${tools.length}</b>&nbsp;AI tools <i class="p__sub">custom built</i></span>
+    <span class="tgrid">${groups.map(([g, n]) => `
+      <a class="tg" href="${SITE}#projects/t/${slug(g)}"><span class="tg__ic">${I[GROUP_ICON[g] || 'spark']}</span>
+        <b>${n}</b><span class="tg__name">${esc(g)}</span>
+        <small>${tools.filter(t => t.group === g).slice(0, 2).map(t => esc(t.name)).join(' \u00b7 ')}</small></a>`).join('')}</span></div>`;
 
   // ---- new message
   const msg = panel('msg', c.phone ? waHref(c.phone) : (c.email ? mailHref(c.email) : SITE + '#contact'),
@@ -157,12 +175,26 @@
     <svg class="growth" viewBox="0 0 ${W} ${H}"><path class="growth__area" d="${path} L${W - 4},${H - 4} L4,${H - 4} Z"/><path class="growth__line" d="${path}"/><circle class="growth__dot" cx="${W - 4}" cy="${H - 8 - (acc / mx) * (H - 16)}" r="2.5"/></svg>
     <span class="growth__axis"><em>${y0}</em><em>${Math.round((y0 + y1) / 2)}</em><em>${y1}</em></span>`);
 
-  ui.innerHTML = [profile, dash, insights, recog, trend, reacts, collab, fb, follower, thumbs, msg, growth].join('');
+  ui.innerHTML = [profile, builds, toolbox, dash, insights, recog, trend, reacts, collab, fb, msg, growth].join(''); // order = phone stacking order
   [...ui.children].forEach((el, i) => el.style.setProperty('--i', i));
 
   // sparkles
   const sparks = document.querySelector('.poster__sparks');
   if (sparks) sparks.innerHTML = Array.from({ length: 28 }, (_, i) => `<i style="left:${(i * 37) % 100}%;top:${(i * 53 + 7) % 100}%;--d:${(i * 0.37) % 4}s;--s:${.4 + ((i * 29) % 7) / 10}"></i>`).join('');
+
+  // live systems feed: types one platform at a time, in rotation (static first line under reduced motion)
+  const feed = ui.querySelector('[data-feed]');
+  if (feed && platforms.length) {
+    const line = pl => `${pl.name} · ${pl.sector}`;
+    if (reduced) feed.textContent = line(platforms[0]);
+    else {
+      let i = 0;
+      (function next() {
+        const text = line(platforms[i++ % platforms.length]); let k = 0; feed.textContent = '';
+        const typer = setInterval(() => { feed.textContent = text.slice(0, ++k); if (k >= text.length) { clearInterval(typer); setTimeout(next, 2200); } }, 28);
+      })();
+    }
+  }
 
   // entrance + count-ups
   requestAnimationFrame(() => document.getElementById('poster').classList.add('is-in'));
