@@ -625,24 +625,28 @@ a { color: inherit; }
 .orbit__cap b { color: var(--cyan); font-family: var(--f-mono); font-size: 17px; text-shadow: 0 0 18px rgba(34, 211, 238, .55); }
 
 /* --- a floating card --- */
+/* .ocard positions and floats; .ocard__card carries the glass and the entrance. Keeping them on
+   separate elements stops the float and the entrance fighting over one `transform`. */
 .ocard { position: absolute; left: calc(var(--x) * 1%); top: calc(var(--y) * 1%); width: calc(var(--w) * 1%);
-  z-index: 4; padding: 11px 12px; border-radius: 14px; border: 1px solid rgba(255, 255, 255, .42);
+  z-index: 4; transform-style: preserve-3d; --lift: 0px;
+  transform:
+    translate3d(calc(var(--px, 0) * var(--d) * 13px), calc(var(--py, 0) * var(--d) * 11px + var(--lift, 0px)), 0)
+    rotateY(calc(var(--rot) * -1deg)) rotateX(calc(var(--py, 0) * 3deg)) rotate(calc(var(--rot) * .28deg)); }
+.ocard__card { position: relative; display: block; padding: 11px 12px; border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, .42);
   background: linear-gradient(150deg, rgba(255, 255, 255, .4), rgba(176, 214, 226, .2) 46%, rgba(14, 40, 49, .45));
   backdrop-filter: blur(11px) saturate(1.3); -webkit-backdrop-filter: blur(11px) saturate(1.3);
   box-shadow: 0 22px 44px rgba(0, 0, 0, .55), inset 0 1px 0 rgba(255, 255, 255, .55),
     inset 0 0 0 1px rgba(255, 255, 255, .06), 0 0 30px color-mix(in srgb, var(--hue) 34%, transparent);
-  transform-style: preserve-3d;
-  --lift: 0px;
-  transform:
-    translate3d(calc(var(--px, 0) * var(--d) * 13px), calc(var(--py, 0) * var(--d) * 11px + var(--lift, 0px)), 0)
-    rotateY(calc(var(--rot) * -1deg)) rotateX(calc(var(--py, 0) * 3deg)) rotate(calc(var(--rot) * .28deg));
   opacity: 0; }
-.ocard::after { /* glass sheen */ content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+.ocard__card::after { /* glass sheen */ content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
   background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, .26) 45%, transparent 58%); }
-.orbit.is-in .ocard { animation:
-    ocard-in .8s cubic-bezier(.2, .8, .2, 1) calc(var(--i) * 110ms) both,
-    ocard-float calc(7s + var(--i) * 1.1s) ease-in-out calc(1s + var(--i) * -.9s) infinite; }
-@keyframes ocard-in { from { opacity: 0; transform: translate3d(0, 26px, -180px) rotateY(calc(var(--rot) * -1deg)) scale(.9); } }
+.orbit.is-in .ocard { animation: ocard-float calc(7s + var(--i) * 1.1s) ease-in-out calc(1s + var(--i) * -.9s) infinite; }
+.orbit.is-in .ocard__card { animation: ocard-in .8s cubic-bezier(.2, .8, .2, 1) calc(var(--i) * 110ms) both; }
+/* every entrance needs an explicit `to`: an implicit one resolves to the element's own opacity: 0 */
+@keyframes ocard-in {
+  from { opacity: 0; transform: translate3d(0, 26px, -70px) scale(.92); }
+  to { opacity: 1; transform: none; } }
 @keyframes ocard-float {
   0%, 100% { --lift: 0px; }
   50% { --lift: calc(var(--d) * -13px); } }
@@ -691,11 +695,11 @@ a { color: inherit; }
 .orbit.is-in .mote { animation:
     mote-in .7s ease calc(.5s + var(--i) * 140ms) both,
     ocard-float calc(6s + var(--i) * 1.3s) ease-in-out calc(var(--i) * -1.7s) infinite; }
-@keyframes mote-in { from { opacity: 0; transform: translateY(18px) scale(.8); } to { opacity: .9; } }
+@keyframes mote-in { from { opacity: 0; } to { opacity: .9; } }
 
 @media (max-width: 900px) {
   .ocard__sub, .ocard__year { display: none; }
-  .ocard { padding: 8px 9px; border-radius: 11px; }
+  .ocard__card { padding: 8px 9px; border-radius: 11px; }
   .ocard__top { grid-template-columns: 28px 1fr 14px; gap: 6px; }
   .ocard__art { width: 28px; height: 28px; }
   .ocard__art svg { width: 15px; height: 15px; }
@@ -706,7 +710,7 @@ a { color: inherit; }
   .orbit { display: none; } /* the plain .cred-list takes over */
 }
 @media (prefers-reduced-motion: reduce) {
-  .orbit.is-in .ocard, .orbit.is-in .mote, .orbit.is-in .ocard__wave i, .orbit.is-in .mote i { animation: none; }
-  .ocard, .mote { opacity: 1; }
+  .orbit.is-in .ocard, .orbit.is-in .ocard__card, .orbit.is-in .mote, .orbit.is-in .ocard__wave i, .orbit.is-in .mote i { animation: none; }
+  .ocard__card, .mote { opacity: 1; }
   .orbit__figure { opacity: 1; transition: none; }
 }

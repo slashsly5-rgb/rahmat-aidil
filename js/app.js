@@ -795,7 +795,8 @@
     // A credential rendered as one of the floating player cards.
     const card = (c, i) => {
       const o = ORBIT[i];
-      return `<article class="ocard" style="--x:${o.x};--y:${o.y};--w:${o.w};--rot:${o.rot};--d:${o.d};--hue:${HUES[i]};--i:${i}">
+      return `<div class="ocard" style="--x:${o.x};--y:${o.y};--w:${o.w};--rot:${o.rot};--d:${o.d};--hue:${HUES[i]};--i:${i}">
+        <article class="ocard__card">
         <div class="ocard__top">
           <span class="ocard__art">${svgIcon(c.icon)}</span>
           <span class="ocard__meta">
@@ -818,7 +819,8 @@
             <span class="ocard__wave">${bars(22, i + 3)}</span>
             <span class="ocard__year">${esc(c.year)}</span>
           </div>`}
-      </article>`;
+        </article>
+      </div>`;
     };
 
     const motes = MOTES.map((m, i) => `<span class="mote mote--${m.cls}" style="--x:${m.x};--y:${m.y};--d:${m.d};--i:${i}" aria-hidden="true">${m.cls === 'eq' ? bars(7, i + 1) : bars(26, i + 9)}</span>`).join('');
