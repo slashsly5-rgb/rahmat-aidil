@@ -79,7 +79,8 @@ a { color: inherit; text-decoration: none; }
 /* roles as chips instead of one long run-on line */
 .prof__chips { display: flex; flex-wrap: wrap; gap: .5cqw; }
 .rchip { padding: .45cqw 1cqw; border-radius: 999px; font: 600 .95cqw/1.25 var(--f-body); color: var(--gold-2);
-  background: rgba(245, 197, 66, .12); border: 1px solid rgba(245, 197, 66, .4); }
+  background: rgba(245, 197, 66, .12); border: 1px solid rgba(245, 197, 66, .4); transition: background .25s, border-color .25s, color .25s; }
+.rchip:hover { background: linear-gradient(180deg, var(--gold-2), var(--gold)); border-color: transparent; color: #1a1204; box-shadow: 0 0 1.4cqw rgba(245, 197, 66, .55); }
 /* bio: icon column keeps the text aligned */
 .prof__bio { display: grid; gap: .45cqw; margin-top: 1.1cqw; font-size: 1.1cqw; }
 .brow { display: grid; grid-template-columns: 2cqw 1fr; gap: .7cqw; align-items: start; }

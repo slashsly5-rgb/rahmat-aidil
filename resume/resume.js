@@ -8,7 +8,7 @@
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const SITE = '../', FB = 'https://www.facebook.com/aidjudigital';
-  const AV = 'avatar.png?v=7'; // bump with index.html when the avatar is re-cropped, so caches refetch
+  const AV = 'avatar.png?v=8'; // bump with index.html when the avatar is re-cropped, so caches refetch
   // WhatsApp deep link: Malaysian local number -> international, no punctuation (016-772 5496 -> 60167725496)
   const waNumber = p => { const d = String(p || '').replace(/\D/g, ''); return d.startsWith('0') ? '6' + d : d; };
   const HELLO = "Hi Dr. Rahmat, I saw your digital resume and would like to talk about a talk / training / AI project.";
@@ -45,7 +45,10 @@
   };
 
   // ---- profile card
-  const roles = P.roles || [];
+  // ELITE@UM first, and each role chip links to the section that backs it
+  const roles = [...(P.roles || [])].sort((a, b) => (/elite/i.test(b) ? 1 : 0) - (/elite/i.test(a) ? 1 : 0));
+  const ROLE_LINK = [[/elite/i, '#academic'], [/advisor|blackstone/i, '#projects']];
+  const roleHref = r => SITE + ((ROLE_LINK.find(([re]) => re.test(r)) || [, '#career'])[1]);
   const bio = [
     ['\u{1F916}', 'AI systems builder \u00b7 platforms, agents, RAG'],
     ['\u{1F3A4}', 'HRDF &amp; DKM certified trainer'],
@@ -68,7 +71,7 @@
       <span><b>${esc(talksStat)}</b><em>talks &amp; trainings</em></span>
       <span><b>${sup.length}</b><em>postgrad students</em></span>
     </span>
-    <span class="prof__chips">${roles.map(r => `<span class="rchip">${esc(r)}</span>`).join('')}</span>
+    <span class="prof__chips">${roles.map(r => `<a class="rchip" href="${roleHref(r)}">${esc(r)}</a>`).join('')}</span>
     <span class="prof__bio">${bio.map(([ic, t]) => `<span class="brow"><i>${ic}</i>${t}</span>`).join('')}</span>
     <span class="prof__btns">
       <a class="b b--gold" href="${SITE}">Visit site</a>
