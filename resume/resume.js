@@ -8,7 +8,7 @@
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const SITE = '../', FB = 'https://www.facebook.com/aidjudigital';
-  const AV = 'avatar.png?v=5'; // bump with index.html when the avatar is re-cropped, so caches refetch
+  const AV = 'avatar.png?v=6'; // bump with index.html when the avatar is re-cropped, so caches refetch
   // WhatsApp deep link: Malaysian local number -> international, no punctuation (016-772 5496 -> 60167725496)
   const waNumber = p => { const d = String(p || '').replace(/\D/g, ''); return d.startsWith('0') ? '6' + d : d; };
   const HELLO = "Hi Dr. Rahmat, I saw your digital resume and would like to talk about a talk / training / AI project.";
