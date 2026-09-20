@@ -705,27 +705,46 @@
   }
 
   // ---------- credentials: cards orbiting the bobblehead ----------
-  // Each card sits at a % position on the stage, tilted in 3D. `d` is its depth: it scales the
-  // float distance and the pointer parallax, so near cards travel further than far ones.
+  // x/y/w are % of the stage, rot is the 3D tilt, d is depth (drives drift distance, parallax and
+  // scale) and z puts the card in front of the figure (4) or behind it (2). `art` indexes ART.
   const ORBIT = [
-    { x: 7, y: 5, w: 30, rot: 8, d: 1.00, face: 'transport' },
-    { x: 60, y: 2, w: 30, rot: -9, d: 0.72, face: 'wave' },
-    { x: 2, y: 34, w: 29, rot: 11, d: 1.18, face: 'wave' },
-    { x: 65, y: 30, w: 30, rot: -6, d: 0.85, face: 'transport' },
-    { x: 8, y: 63, w: 31, rot: 6, d: 0.92, face: 'transport' },
-    { x: 58, y: 60, w: 31, rot: -11, d: 1.22, face: 'wave' },
+    { x: 4, y: 9, w: 27, rot: 15, d: 1.05, z: 4, face: 'transport' },
+    { x: 57, y: 6, w: 28, rot: -16, d: 0.80, z: 4, face: 'wave' },
+    { x: -2, y: 30, w: 26, rot: 19, d: 1.28, z: 4, face: 'wave' },
+    { x: 68, y: 25, w: 27, rot: -13, d: 0.92, z: 4, face: 'transport' },
+    { x: 7, y: 54, w: 29, rot: 12, d: 1.18, z: 4, face: 'transport' },
+    { x: 62, y: 49, w: 28, rot: -17, d: 1.32, z: 4, face: 'wave' },
+    { x: 27, y: 73, w: 27, rot: 7, d: 1.00, z: 4, face: 'wave' },
+    { x: 59, y: 71, w: 26, rot: -9, d: 0.88, z: 4, face: 'transport' },
+    { x: 20, y: 17, w: 23, rot: 21, d: 0.66, z: 2, face: 'mini' },
+    { x: 46, y: 1, w: 21, rot: -5, d: 0.58, z: 2, face: 'mini' },
   ];
-  // Loose widgets that drift with the cards, like the reference: an equaliser and a bare waveform.
+  // Square sector renders double as the cards' album art, like the thumbnails in the reference.
+  const ART = ['energy', 'enterprise', 'education', 'government', 'hr', 'legal', 'tourism', 'logistics', 'infrastructure'];
+  // Loose widgets that drift alongside the cards.
   const MOTES = [
-    { cls: 'eq', x: 37, y: 3, d: 0.6 },
-    { cls: 'wave', x: 56, y: 20, d: 1.05 },
-    { cls: 'eq', x: 34, y: 76, d: 0.8 },
+    { cls: 'eq', x: 37, y: 4, d: 0.7 },
+    { cls: 'wave', x: 53, y: 30, d: 1.1 },
+    { cls: 'eq', x: 33, y: 62, d: 0.9 },
+    { cls: 'wave', x: 40, y: 88, d: 0.8 },
   ];
   function renderCredentials() {
     const C = DATA.credentials;
     const el = document.getElementById('credentials');
     if (!C) { hideSection(el, 'credentials'); return; }
-    const creds = (C.credentials || []).filter(c => c.year).slice(0, ORBIT.length); // dated trainer/TVET credentials (ELITE@UM lives in Academic)
+    // Certified: the dated trainer/TVET credentials (ELITE@UM lives in Academic).
+    // Invited, on stage: a few dated talks, so the stage carries both halves of the section.
+    const certs = (C.credentials || []).filter(c => c.year);
+    // talk titles are sentences; cut them at the first natural break and cap them to card width
+    const trim = (v, n) => {
+      const head = String(v).split(/ [—-]+ |: /)[0].replace(/^["“]|["”]$/g, '').trim();
+      return head.length > n ? head.slice(0, n - 1).replace(/[ ,]+$/, '') + '…' : head;
+    };
+    // "Malaysia Digital Economy Corporation (MDEC)" -> "MDEC": card subtitles have no room for the long form
+    const shortOrg = v => (String(v).match(/\(([^)]{2,12})\)/) || [])[1] || trim(v, 26);
+    const guest = (C.talks || []).filter(t => t.org && L.parseDate(t.date)).slice(0, ORBIT.length - certs.length)
+      .map(t => ({ short: trim(t.title, 25), org: shortOrg(t.org), icon: 'mic', year: String(t.date).slice(0, 4), kind: 'talk' }));
+    const creds = [...certs, ...guest].slice(0, ORBIT.length);
     const ICON = {
       mic: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"/>',
       cart: '<path d="M3 4h2l2.4 11h10.2L20 7H7"/><circle cx="9" cy="19" r="1.5"/><circle cx="16" cy="19" r="1.5"/>',
@@ -734,7 +753,7 @@
       diploma: '<rect x="3" y="5" width="18" height="12" rx="2"/><path d="M7 9h10M7 12h6"/><circle cx="16" cy="15" r="2"/><path d="M15 17l-1 4 2-1 2 1-1-4"/>',
       shield: '<path d="M12 2l8 3v7c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V5z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>',
     };
-    const HUES = ['#3b82f6', '#22d3ee', '#19e39b', '#a855f7', '#3b82f6', '#22d3ee']; // matches the pillar colours in the clip
+    const HUES = ['#3b82f6', '#22d3ee', '#19e39b', '#a855f7', '#f59e0b', '#ec4899', '#22d3ee', '#19e39b', '#a855f7', '#3b82f6'];
     const svgIcon = k => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k] || ICON.shield}</svg>`;
     const E = C.engine || { label: 'Training Engine', stat: '', caption: '' };
     const cap = c => c.code && c.code.length <= 12 ? `Cert. ${c.code}` : 'Certified';
@@ -792,41 +811,38 @@
     };
     const glyph = (k, cls) => `<svg class="${cls}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${GLYPH[k]}</svg>`;
 
-    // A credential rendered as one of the floating player cards.
+    // One floating player card. Three nested elements so position, drift and fade never share a transform.
     const card = (c, i) => {
       const o = ORBIT[i];
-      return `<div class="ocard" style="--x:${o.x};--y:${o.y};--w:${o.w};--rot:${o.rot};--d:${o.d};--hue:${HUES[i]};--i:${i}">
-        <article class="ocard__card">
-        <div class="ocard__top">
-          <span class="ocard__art">${svgIcon(c.icon)}</span>
-          <span class="ocard__meta">
-            <b class="ocard__title">${esc(c.short || c.title)}</b>
-            <span class="ocard__sub">${esc(c.org || c.issuer)}</span>
-          </span>
-          <span class="ocard__badge" title="${esc(cap(c))}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
-          </span>
+      const deck = o.face === 'transport'
+        ? `<div class="ocard__deck">${glyph('prev', 'ocard__skip')}<span class="ocard__play">${glyph('play', '')}</span>${glyph('next', 'ocard__skip')}<span class="ocard__year">${esc(c.year)}</span></div>
+           <span class="ocard__track"><i style="--p:${48 + i * 5}%"></i></span>`
+        : o.face === 'mini'
+          ? `<span class="ocard__track"><i style="--p:${40 + i * 6}%"></i></span>`
+          : `<div class="ocard__deck ocard__deck--wave"><span class="ocard__play ocard__play--sm">${glyph('play', '')}</span><span class="ocard__wave">${bars(20, i + 3)}</span><span class="ocard__year">${esc(c.year)}</span></div>`;
+      return `<div class="ocard" style="--x:${o.x};--y:${o.y};--w:${o.w};--rot:${o.rot};--d:${o.d};--z:${o.z};--hue:${HUES[i % HUES.length]};--i:${i}">
+        <div class="ocard__drift">
+          <article class="ocard__card">
+            <div class="ocard__top">
+              <span class="ocard__art"><img src="media/sectors/${ART[i % ART.length]}.jpg" alt="" width="480" height="480" loading="lazy" decoding="async"></span>
+              <span class="ocard__meta">
+                <b class="ocard__title">${esc(c.short || c.title)}</b>
+                <span class="ocard__sub">${esc(c.org || c.issuer)}</span>
+              </span>
+              <span class="ocard__badge" title="${esc(c.kind === 'talk' ? 'Invited' : cap(c))}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+              </span>
+            </div>
+            ${deck}
+          </article>
         </div>
-        ${o.face === 'transport' ? `<div class="ocard__deck">
-            ${glyph('prev', 'ocard__skip')}
-            <span class="ocard__play">${glyph('play', '')}</span>
-            ${glyph('next', 'ocard__skip')}
-            <span class="ocard__year">${esc(c.year)}</span>
-          </div>
-          <span class="ocard__track"><i style="--p:${52 + i * 6}%"></i></span>`
-        : `<div class="ocard__deck ocard__deck--wave">
-            <span class="ocard__play ocard__play--sm">${glyph('play', '')}</span>
-            <span class="ocard__wave">${bars(22, i + 3)}</span>
-            <span class="ocard__year">${esc(c.year)}</span>
-          </div>`}
-        </article>
       </div>`;
     };
 
-    const motes = MOTES.map((m, i) => `<span class="mote mote--${m.cls}" style="--x:${m.x};--y:${m.y};--d:${m.d};--i:${i}" aria-hidden="true">${m.cls === 'eq' ? bars(7, i + 1) : bars(26, i + 9)}</span>`).join('');
+    const motes = MOTES.map((m, i) => `<span class="mote mote--${m.cls}" style="--x:${m.x};--y:${m.y};--d:${m.d};--i:${i}" aria-hidden="true"><span class="mote__drift">${m.cls === 'eq' ? bars(7, i + 1) : bars(24, i + 9)}</span></span>`).join('');
 
-    const list = creds.map((c, i) => `
-      <li class="cl" style="--hue:${HUES[i]}"><span class="cl__icon">${svgIcon(c.icon)}</span>
+    const list = certs.map((c, i) => `
+      <li class="cl" style="--hue:${HUES[i % HUES.length]}"><span class="cl__icon">${svgIcon(c.icon)}</span>
         <div><b>${esc(c.short || c.title)}</b><span class="muted small">${esc(c.org || c.issuer)} · ${esc(cap(c))}</span></div><b class="cl__year">${esc(c.year)}</b></li>`).join('');
 
     el.innerHTML = head('credentials', 'Credentials & Talks', 'Certified, invited, on stage') +
