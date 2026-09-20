@@ -43,7 +43,7 @@
   const profile = panel('profile', SITE, `
     <span class="p__brand">${I.fb}<b>facebook</b></span>
     <span class="prof">
-      <span class="prof__avatar"><img src="figure.png" alt=""></span>
+      <span class="prof__avatar"><img src="avatar.png" alt=""></span>
       <span class="prof__id">
         <b class="prof__handle">aidjudigital <i class="v" aria-label="verified">${I.check}</i></b>
         <span class="prof__name">${esc(P.name)} | ${esc(P.title || '')}</span>
@@ -111,7 +111,7 @@
   // ---- new follower -> new role
   const latest = jobs.slice().sort((a, b) => String(b.start).localeCompare(String(a.start)))[0];
   const follower = panel('follower', SITE + '#career', `
-    <span class="row"><span class="prof__avatar prof__avatar--s"><img src="figure.png" alt=""></span><span><small>New role</small><b>${esc(latest ? latest.title : '')}</b><em>${esc(latest ? `${latest.org} · since ${latest.start}` : '')}</em></span></span>
+    <span class="row"><span class="prof__avatar prof__avatar--s"><img src="avatar.png" alt=""></span><span><small>New role</small><b>${esc(latest ? latest.title : '')}</b><em>${esc(latest ? `${latest.org} · since ${latest.start}` : '')}</em></span></span>
     <span class="b b--gold b--xs">View career</span>`);
 
   // ---- portfolio thumbnails
