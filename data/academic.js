@@ -5,6 +5,13 @@ window.DATA.academic = {
     issuer: 'Universiti Malaya',
     text: 'Appointed and recognised as an ELITE@UM Expert by Universiti Malaya, acknowledging his standing as a subject-matter expert in Artificial Intelligence, AI system development and digital transformation, and his contribution to bridging academia and industry through applied AI.',
   },
+  // Courses taught at UTS (2025 teaching load).
+  teaching: [
+    { code: 'MBB3123', title: 'Management Information Systems' },
+    { code: 'MTM3643', title: 'Multimedia Technology' },
+    { code: 'MBB3253 / MBC3893 / MBM3753', title: 'E-Commerce' },
+    { code: 'MPM4333', title: 'Integrated Project' },
+  ],
   areas: [
     { id: 'ai-adoption', label: 'AI adoption' },
     { id: 'digital-marketing', label: 'Digital marketing' },

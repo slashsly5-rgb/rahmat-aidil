@@ -569,7 +569,8 @@
     const A = DATA.academic;
     const el = document.getElementById('academic');
     if (!A) { hideSection(el, 'academic'); return; }
-    const areas = A.areas || [], sup = A.supervision || []; // publications exist in the data but are not shown (owner's call)
+    const areas = A.areas || [], sup = A.supervision || [];
+    const pubs = A.publications || [], teaching = A.teaching || [];
 
     // Research-area graph: nodes on an ellipse, links to a central hub.
     const W = 640, H = 360, cx = W / 2, cy = H / 2;
@@ -611,6 +612,7 @@
       people: '<circle cx="9" cy="8" r="3.2"/><circle cx="17" cy="9" r="2.4"/><path d="M3 20c0-3.5 2.7-6 6-6s6 2.5 6 6"/><path d="M15 20c0-2.6 1.6-4.6 4-5 1.2.3 2 1.4 2 3.5"/>',
       book: '<path d="M4 4h7a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H4z"/><path d="M20 4h-7a3 3 0 0 0-3 3v13a2 2 0 0 1 2-2h8z"/>',
       shield: '<path d="M12 2l8 3v7c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V5z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>',
+      quill: '<path d="M4 20c6-1 10-4 13-10l3-7-7 3C7 9 5 13 4 20z"/><path d="M4 20l6-6"/>',
     };
     const slabs = [
       phd && { id: 'edu', icon: 'cap', title: 'Doctorate', stat: '', sub: `${phd.qualification} · ${phd.institution}, ${phd.year}` },
@@ -618,6 +620,8 @@
       main.length && { id: 'sup', icon: 'people', title: 'Postgraduate supervision', stat: main.length, sub: `Main supervisor · ${lvl(main)} · ongoing AI-integrated theses` },
       co.length && { id: 'co', icon: 'book', title: 'Co-supervision', stat: co.length, sub: `Co-supervisor · ${lvl(co)} · cross-faculty research` },
       rec && { id: 'rec', icon: 'shield', title: 'Academic recognition', stat: '', sub: `${rec.title} · ${rec.issuer}` },
+      pubs.length && { id: 'pubs', icon: 'quill', title: 'Publications', stat: pubs.length,
+        sub: `${L.countBy(pubs, 'type').map(([t, n]) => `${n} ${t.toLowerCase()}`).join(' · ')} · ${Math.min(...pubs.map(p => p.year))}–${Math.max(...pubs.map(p => p.year))}` },
     ].filter(Boolean);
     const slabHTML = slabs.map((d, i) => `
       <li class="slab-wrap" style="--i:${i}">
@@ -632,11 +636,19 @@
       </li>`).join('');
     const pane = (id, title, body) => `<section class="pane" id="pane-${id}" data-pane="${id}"${id === slabs[0].id ? '' : ' hidden'}><h3 class="pane__title">${esc(title)}</h3>${body}</section>`;
     const panes = [
-      phd && pane('edu', 'Education', `<ol class="edu">${edu.map(e => `<li class="edu__row"><span class="edu__year">${esc(e.year)}</span><div><p class="edu__q">${esc(e.qualification)}</p><p class="muted small">${[e.institution, e.focus].filter(Boolean).map(esc).join(' · ')}</p></div></li>`).join('')}</ol>`),
+      phd && pane('edu', 'Education', `<ol class="edu">${edu.map(e => `<li class="edu__row"><span class="edu__year">${esc(e.year)}</span><div><p class="edu__q">${esc(e.qualification)}</p><p class="muted small">${[e.institution, e.focus].filter(Boolean).map(esc).join(' · ')}</p></div></li>`).join('')}</ol>` +
+        (teaching.length ? `<h4 class="pane__sub">Courses taught</h4><ul class="courses">${teaching.map(c => `<li><b>${esc(c.code)}</b><span>${esc(c.title)}</span></li>`).join('')}</ul>` : '')),
       areas.length && pane('areas', 'Research areas', `<div class="acad__graph">${graph}<p class="muted small">Node size = number of supervised theses in that area.</p></div>`),
       main.length && pane('sup', 'Postgraduate supervision', `${roleBox('Main supervisor', main)}${areaChips}<div class="scards">${supCard(main)}</div>`),
       co.length && pane('co', 'Co-supervision', `${roleBox('Co-supervisor', co)}<div class="scards">${supCard(co)}</div>`),
       rec && pane('rec', 'Academic recognition', `<p class="rec__title">${esc(rec.title)} <span class="muted">· ${esc(rec.issuer)}</span></p><p class="rec__text">${esc(rec.text)}</p>`),
+      pubs.length && pane('pubs', 'Publications', L.countBy(pubs, 'type').slice().reverse().map(([type, n]) => `
+        <h4 class="pane__sub">${esc(type)} <span class="muted">(${n})</span></h4>
+        <ol class="pubs">${pubs.filter(p => p.type === type).sort((a, b) => b.year - a.year).map(p => `
+          <li class="pub"><span class="pub__year">${esc(p.year)}</span><div>
+            <p class="pub__t">${esc(p.title)}</p>
+            <p class="muted small">${[p.authors, p.venue].filter(Boolean).map(esc).join(' · ')}</p>
+          </div></li>`).join('')}</ol>`).join('')),
     ].filter(Boolean).join('');
     const shards = Array.from({ length: 9 }, (_, i) => `<i class="shard" style="--s:${i};left:${(i * 37) % 96}%;top:${(i * 53 + 11) % 90}%;transform:scale(${(.55 + ((i * 29) % 7) / 10).toFixed(2)})"></i>`).join('');
 
@@ -721,6 +733,32 @@
     const cap = c => c.code && c.code.length <= 12 ? `Cert. ${c.code}` : 'Certified';
     const at = (x, y) => `left:${x}%;top:${y}%`;
 
+    // Talks & trainings: newest dated first, undated ones after (L.splitByDate), grouped by year.
+    const talks = C.talks || [];
+    const { upcoming, past } = L.splitByDate(talks);
+    const fmt = t => {
+      const d = L.parseDate(t.date);
+      if (!d) return '';
+      return /^\d{4}$/.test(t.date) ? t.date : d.toLocaleString('en-GB', { month: 'short', year: 'numeric' });
+    };
+    const talkLI = t => `<li class="talk${fmt(t) ? '' : ' talk--nodate'}">
+      ${fmt(t) ? `<span class="talk__when">${esc(fmt(t))}</span>` : ''}
+      <div><p class="talk__t">${esc(t.title)}</p>
+        ${[t.org, t.place, t.audience].some(Boolean) ? `<p class="muted small">${[t.org, t.place, t.audience].filter(Boolean).map(esc).join(' · ')}</p>` : ''}
+      </div></li>`;
+    const LEAD = 10;
+    const ordered = [...upcoming, ...past];
+    const talksHTML = talks.length ? `
+      <div class="talks">
+        <div class="talks__head">
+          <h3>Talks &amp; trainings</h3>
+          <p class="muted small"><b>${E.stat || talks.length}</b> delivered · ${talks.length} on record here${upcoming.length ? ` · ${upcoming.length} upcoming` : ''}</p>
+        </div>
+        <ol class="talks__list">${ordered.slice(0, LEAD).map(talkLI).join('')}</ol>
+        <ol class="talks__list talks__list--more" hidden>${ordered.slice(LEAD).map(talkLI).join('')}</ol>
+        ${ordered.length > LEAD ? `<button class="btn btn--ghost talks__more" type="button" aria-expanded="false">Show all ${ordered.length}</button>` : ''}
+      </div>` : '';
+
     const tabs = (C.feeders || []).slice(0, 3).map((f, i) => `<span class="st__tab" style="${at(STAGE.tabs[i].x, STAGE.tabs[i].y)};--i:${i}">${esc(f.label)}</span>`).join('');
     const rings = creds.map((c, i) => `<span class="st__ring" style="${at(STAGE.rings[i], STAGE.ringY)};--i:${i};--hue:${HUES[i]}">${svgIcon(c.icon)}</span>`).join('');
     const pillars = creds.map((c, i) => `
@@ -745,7 +783,8 @@
           ${rings}${pillars}
         </div>
       </div>
-      <ol class="cred-list">${list}</ol>`;
+      <ol class="cred-list">${list}</ol>
+      ${talksHTML}`;
 
     // Clip playback (poster stays when autoplay is blocked or motion is reduced); pause off-screen.
     const clip = el.querySelector('.stage__clip'), stage = el.querySelector('.stage');
@@ -765,6 +804,16 @@
         (function tick(now) { const k = Math.min(1, Math.max(0, (now - t0) / 1100)); n.textContent = Math.round(from + (to - from) * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(tick); })(t0);
       });
     }, { threshold: .3 }).observe(stage);
+
+    const more = el.querySelector('.talks__more'), rest = el.querySelector('.talks__list--more');
+    more && more.addEventListener('click', () => {
+      const open = rest.hidden;
+      rest.hidden = !open;
+      more.setAttribute('aria-expanded', String(open));
+      more.textContent = open ? 'Show fewer' : `Show all ${ordered.length}`;
+      if (!open) el.querySelector('.talks').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+      refreshSoon();
+    });
   }
 
   // ---------- contact ----------
