@@ -6,7 +6,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 const { validate } = require('../js/lib.js');
 
-const FILES = ['profile', 'career', 'projects', 'academic', 'credentials'];
+const FILES = ['profile', 'career', 'projects', 'academic', 'credentials', 'training'];
 
 function loadData() {
   const ctx = { window: {} };
@@ -27,6 +27,8 @@ test('data has real content in every section', () => {
   assert.ok(D.projects.tools.length >= 15, 'tools');
   assert.ok(D.academic.supervision.length >= 8, 'supervision');
   assert.ok(D.credentials.talks.length >= 8, 'talks');
+  assert.ok(D.training.programmes.length >= 20, 'training programmes');
+  assert.ok(D.training.programmes.every(p => p.topics.length), 'every programme has topics');
 });
 
 test('contact details match owner rule', () => {

@@ -614,13 +614,29 @@ a { color: inherit; }
 .talks__head b { color: var(--cyan); font-family: var(--f-mono); }
 .talks__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .talks__list--more { margin-top: 8px; }
-.talk { display: grid; grid-template-columns: 92px 1fr; gap: 12px; padding: 11px 14px; border-radius: 12px; border: 1px solid var(--line); background: rgba(5, 20, 24, .35); }
-.talk__when { font: 600 13px/1.5 var(--f-mono); color: var(--cyan); }
+.talk { padding: 11px 14px; border-radius: 12px; border: 1px solid var(--line); background: rgba(5, 20, 24, .35); }
 .talk__t { margin: 0 0 2px; font-weight: 500; line-height: 1.35; }
-.talk--nodate { grid-template-columns: 1fr; }
 .talks__more { margin-top: 14px; }
 @media (max-width: 640px) {
-  .talk { grid-template-columns: 1fr; gap: 2px; }
   .pub, .edu__row { grid-template-columns: 1fr; gap: 2px; }
   .courses li { grid-template-columns: 1fr; gap: 2px; }
 }
+
+/* ---- credentials: training catalogue (added 2026-09-21) ---- */
+.cat { margin-top: 28px; }
+.cat__grid { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); align-items: start; }
+.cat__card { border-radius: 12px; border: 1px solid var(--line); background: rgba(5, 20, 24, .35); transition: border-color .2s ease; }
+.cat__card[open] { border-color: var(--cyan); }
+.cat__card summary { display: grid; gap: 3px; padding: 12px 14px; cursor: pointer; list-style: none; }
+.cat__card summary::-webkit-details-marker { display: none; }
+.cat__card summary::after { content: '+'; position: absolute; right: 16px; font: 400 20px/1 var(--f-mono); color: var(--cyan); }
+.cat__card[open] summary::after { content: '\2013'; }
+.cat__card summary { position: relative; padding-right: 38px; }
+.cat__card summary b { font: 600 14.5px/1.3 var(--f-display); }
+.cat__card summary:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; border-radius: 12px; }
+.cat__body { padding: 0 14px 14px; }
+.cat__body h5 { margin: 10px 0 6px; font: 700 11px/1.2 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--cyan); }
+.cat__body ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+.cat__body li { font-size: 13.5px; line-height: 1.4; color: var(--muted); }
+.cat__aud { margin: 14px 0 0; line-height: 1.6; }
+.cat__aud b { color: #fff; }

@@ -112,5 +112,6 @@ function validData() {
     projects: { platforms: [{ name: 'P', summary: 'S', sector: 'Gov' }], tools: [{ name: 'T', summary: 'S' }] },
     academic: { areas: [{ id: 'a', label: 'A' }], supervision: [{ title: 'T', level: 'PhD', status: 'Ongoing', role: 'Main supervisor' }], publications: [{ title: 'T', year: 2024, type: 'Journal' }] },
     credentials: { credentials: [{ title: 'C', issuer: 'I' }], talks: [{ title: 'T', date: '2025-04' }] },
+    training: { audience: ['Entrepreneurs'], programmes: [{ name: 'P', topics: ['t'], objectives: ['o'], pax: '20 - 30' }] },
   };
 }

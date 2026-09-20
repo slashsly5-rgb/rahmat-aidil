@@ -735,24 +735,41 @@
 
     // Talks & trainings: newest dated first, undated ones after (L.splitByDate), grouped by year.
     const talks = C.talks || [];
-    const { upcoming, past } = L.splitByDate(talks);
-    const fmt = t => {
-      const d = L.parseDate(t.date);
-      if (!d) return '';
-      return /^\d{4}$/.test(t.date) ? t.date : d.toLocaleString('en-GB', { month: 'short', year: 'numeric' });
-    };
-    const talkLI = t => `<li class="talk${fmt(t) ? '' : ' talk--nodate'}">
-      ${fmt(t) ? `<span class="talk__when">${esc(fmt(t))}</span>` : ''}
-      <div><p class="talk__t">${esc(t.title)}</p>
-        ${[t.org, t.place, t.audience].some(Boolean) ? `<p class="muted small">${[t.org, t.place, t.audience].filter(Boolean).map(esc).join(' · ')}</p>` : ''}
-      </div></li>`;
+    const { upcoming, past } = L.splitByDate(talks); // dates order the list; they are not shown
+    const talkLI = t => `<li class="talk">
+      <p class="talk__t">${esc(t.title)}</p>
+      ${[t.org, t.place, t.audience].some(Boolean) ? `<p class="muted small">${[t.org, t.place, t.audience].filter(Boolean).map(esc).join(' · ')}</p>` : ''}
+      </li>`;
+    // Training catalogue: what he can be booked to deliver. Each card opens its syllabus.
+    const T = DATA.training || {}, progs = T.programmes || [];
+    const detail = (label, items) => items && items.length
+      ? `<h5>${esc(label)}</h5><ul>${items.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : '';
+    const catalogueHTML = progs.length ? `
+      <div class="cat">
+        <div class="talks__head">
+          <h3>Training programmes</h3>
+          <p class="muted small"><b>${progs.length}</b> ready-to-run programmes${T.audience && T.audience.length ? ` · ${T.audience.length} audience types` : ''} · typically ${esc(progs[0].pax || '20 - 30')} participants</p>
+        </div>
+        <ul class="cat__grid">${progs.map((p, i) => `
+          <li class="cat__item">
+            <details class="cat__card"${i < 0 ? ' open' : ''}>
+              <summary>
+                <b>${esc(p.name)}</b>
+                <span class="muted small">${p.topics.length} topics${p.pax ? ` · ${esc(p.pax)} pax` : ''}</span>
+              </summary>
+              <div class="cat__body">${detail('Topics covered', p.topics)}${detail('Outcomes', p.objectives)}</div>
+            </details>
+          </li>`).join('')}</ul>
+        ${T.audience && T.audience.length ? `<p class="cat__aud muted small"><b>Who it is for:</b> ${T.audience.map(esc).join(' · ')}</p>` : ''}
+      </div>` : '';
+
     const LEAD = 10;
     const ordered = [...upcoming, ...past];
     const talksHTML = talks.length ? `
       <div class="talks">
         <div class="talks__head">
           <h3>Talks &amp; trainings</h3>
-          <p class="muted small"><b>${E.stat || talks.length}</b> delivered · ${talks.length} on record here${upcoming.length ? ` · ${upcoming.length} upcoming` : ''}</p>
+          <p class="muted small"><b>${E.stat || talks.length}</b> delivered · ${talks.length} on record here</p>
         </div>
         <ol class="talks__list">${ordered.slice(0, LEAD).map(talkLI).join('')}</ol>
         <ol class="talks__list talks__list--more" hidden>${ordered.slice(LEAD).map(talkLI).join('')}</ol>
@@ -784,6 +801,7 @@
         </div>
       </div>
       <ol class="cred-list">${list}</ol>
+      ${catalogueHTML}
       ${talksHTML}`;
 
     // Clip playback (poster stays when autoplay is blocked or motion is reduced); pause off-screen.

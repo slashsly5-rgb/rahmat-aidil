@@ -60,6 +60,7 @@
     'academic.publications': ['title', 'year', 'type'],
     'credentials.credentials': ['title', 'issuer'],
     'credentials.talks': ['title'], // date optional: undated CV entries are listed as past
+    'training.programmes': ['name'],
   };
   const DATE_FIELDS = ['date', 'until', 'start', 'end'];
   const FORBIDDEN = ['ic', 'nric', 'gender', 'address', 'homeAddress', 'studentName', 'student'];
