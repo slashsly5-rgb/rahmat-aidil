@@ -1,0 +1,123 @@
+window.DATA = window.DATA || {};
+window.DATA.career = {
+  jobs: [
+    {
+      title: 'Department of East Asian Studies',
+      org: 'University of Malaya',
+      start: '2005',
+      place: 'Kuala Lumpur, Malaysia',
+      focus: 'Business',
+    },
+    {
+      title: 'Executive',
+      org: 'CIMB Bank',
+      start: '2006',
+      place: 'Kuala Lumpur, Malaysia',
+      focus: 'Business and Marketing',
+    },
+    {
+      title: 'Office of International Centre',
+      org: 'Chonnam National University',
+      start: '2007',
+      place: 'Gwangju, South Korea',
+      focus: 'Business and Marketing',
+    },
+    {
+      title: 'Project Manager',
+      org: 'LG Twin Tower, Yeoui-daero',
+      start: '2008',
+      place: 'Seoul, South Korea',
+      focus: 'Business and Marketing',
+    },
+    {
+      title: 'Project Manager',
+      org: 'LG Electronics Malaysia Sdn. Bhd.',
+      start: '2015',
+      place: 'Petaling Jaya, Malaysia',
+      focus: 'Business and Marketing',
+    },
+    {
+      title: 'Senior Lecturer, School of Business and Management',
+      org: 'University of Technology Sarawak',
+      start: '2016',
+      end: 'Present',
+      place: 'Sibu, Sarawak',
+      focus: 'Digital Marketing and Digital Data Management',
+    },
+    {
+      title: 'Head of Program for Marketing',
+      org: 'University of Technology Sarawak',
+      start: '2017',
+      place: 'Sibu, Sarawak',
+      focus: 'Digital Marketing and Digital Data Management',
+    },
+    {
+      title: 'Deputy Dean, School of Business and Management',
+      org: 'University of Technology Sarawak',
+      start: '2023',
+      end: '2026',
+      place: 'Sibu, Sarawak',
+      focus: 'Management',
+    },
+    {
+      title: 'Dean, School of Business and Management',
+      org: 'University of Technology Sarawak',
+      start: '2026-06',
+      end: 'Present',
+      place: 'Sibu, Sarawak',
+      focus: 'Management and Leadership',
+    },
+    {
+      title: 'Acting Chief Digital Officer',
+      org: 'University of Technology Sarawak',
+      start: '2026-09-01',
+      end: 'Present',
+      place: 'Sibu, Sarawak',
+      focus: 'Digital Transformation and University Systems',
+    },
+  ],
+  sideRoles: [
+    {
+      title: 'Chief AI Advisor',
+      org: 'Blackstone Intelligence (Blackstone Consultancy)',
+      start: '2023',
+      end: 'Present',
+    },
+    {
+      title: 'CEO',
+      org: 'Asia e-Incubation Hub Sdn. Bhd. (AeIH)',
+      start: '2023',
+      end: '2026',
+    },
+    {
+      title: 'ELITE@UM Expert',
+      org: 'Universiti Malaya',
+    },
+  ],
+  education: [
+    {
+      qualification: 'Doctor of Philosophy in Business Management',
+      institution: 'University of Technology Sarawak',
+      year: '2023',
+      focus: 'Digital Marketing, Data Management, AI, Content Creation',
+    },
+    {
+      qualification: 'Master of Business Administration',
+      institution: 'Chonnam National University, South Korea',
+      year: '2012',
+      focus: 'International Trade',
+    },
+    {
+      qualification: 'Bachelor of Arts (Honors)',
+      institution: 'University of Malaya, Kuala Lumpur',
+      year: '2005',
+      focus: 'Japanese Studies',
+    },
+    {
+      qualification: 'Bachelor',
+      institution: 'Meio University, Okinawa, Japan',
+      year: '2005',
+      focus: 'Japanese Language',
+    },
+  ],
+};
