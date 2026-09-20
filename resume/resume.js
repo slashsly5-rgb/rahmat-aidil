@@ -8,7 +8,7 @@
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const SITE = '../', FB = 'https://www.facebook.com/aidjudigital';
-  const AV = 'avatar.png?v=6'; // bump with index.html when the avatar is re-cropped, so caches refetch
+  const AV = 'avatar.png?v=7'; // bump with index.html when the avatar is re-cropped, so caches refetch
   // WhatsApp deep link: Malaysian local number -> international, no punctuation (016-772 5496 -> 60167725496)
   const waNumber = p => { const d = String(p || '').replace(/\D/g, ''); return d.startsWith('0') ? '6' + d : d; };
   const HELLO = "Hi Dr. Rahmat, I saw your digital resume and would like to talk about a talk / training / AI project.";
@@ -27,9 +27,8 @@
   const POS = {
     profile: { x: 3, y: 2.5, w: 60 },   dash: { x: 66, y: 4, w: 31 },       insights: { x: 66, y: 19.5, w: 31 },
     recog: { x: 66, y: 34.5, w: 31 },    trend: { x: 66, y: 45.5, w: 31 },   reacts: { x: 66, y: 56, w: 31 },
-    collab: { x: 66, y: 62, w: 31 },     fb: { x: 83, y: 74, w: 12 },        follower: { x: 3, y: 34, w: 24 },
-    thumbs: { x: 3, y: 46, w: 30 },      likes: { x: 3, y: 60.5, w: 16 },     msg: { x: 3, y: 67, w: 24 },
-    growth: { x: 3, y: 75, w: 27 },
+    collab: { x: 66, y: 62, w: 31 },     fb: { x: 83, y: 74, w: 12 },        follower: { x: 3, y: 45, w: 24 },
+    thumbs: { x: 3, y: 56, w: 30 },      msg: { x: 3, y: 68, w: 24 },         growth: { x: 3, y: 74.5, w: 27 },
   };
   const at = k => `left:${POS[k].x}%;top:${POS[k].y}%;width:${POS[k].w}%`;
   const panel = (k, href, body, extra = '') => `<a class="p p--${k}${extra}" style="${at(k)}" href="${esc(href)}"${/^https?:/.test(href) ? ' rel="noopener" target="_blank"' : ''}>${body}</a>`;
@@ -47,25 +46,30 @@
 
   // ---- profile card
   const roles = P.roles || [];
+  const bio = [
+    ['\u{1F916}', 'AI systems builder \u00b7 platforms, agents, RAG'],
+    ['\u{1F3A4}', 'HRDF &amp; DKM certified trainer'],
+    ['\u{1F7E2}', 'Available for talks, trainings &amp; AI advisory'],
+    c.email && ['\u2709\uFE0F', esc(c.email)],
+    ['\u{1F517}', esc(FB.replace('https://www.', ''))],
+  ].filter(Boolean);
   const profile = `<div class="p p--profile" style="${at('profile')}">
     <span class="p__brand">${I.fb}<b>facebook</b></span>
     <span class="prof">
       <span class="prof__avatar"><img src="${AV}" alt=""></span>
       <span class="prof__id">
         <b class="prof__handle">aidjudigital <i class="v" aria-label="verified">${I.check}</i></b>
-        <span class="prof__name">${esc(P.name)} | ${esc(P.title || '')}</span>
-        <span class="prof__stats">
-          <span><b>${platforms.length}</b>AI platforms</span><span><b>${esc(talksStat)}</b>talks &amp; trainings</span><span><b>${sup.length}</b>postgrad students</span>
-        </span>
+        <span class="prof__name">${esc(P.name)}</span>
+        <span class="prof__role">${esc(P.title || '')}</span>
       </span>
     </span>
-    <span class="prof__bio">
-      <span>${roles.map(esc).join(' &nbsp;·&nbsp; ')}</span>
-      <span>🤖 AI systems builder &nbsp; 🎓 ELITE@UM Expert &nbsp; 🎤 HRDF &amp; DKM certified trainer</span>
-      <span>🟢 Available for talks, trainings &amp; AI advisory</span>
-      ${c.email ? `<span>✉️ ${esc(c.email)}</span>` : ''}
-      <span>🔗 ${esc(FB.replace('https://', ''))}</span>
+    <span class="prof__stats">
+      <span><b>${platforms.length}</b><em>AI platforms</em></span>
+      <span><b>${esc(talksStat)}</b><em>talks &amp; trainings</em></span>
+      <span><b>${sup.length}</b><em>postgrad students</em></span>
     </span>
+    <span class="prof__chips">${roles.map(r => `<span class="rchip">${esc(r)}</span>`).join('')}</span>
+    <span class="prof__bio">${bio.map(([ic, t]) => `<span class="brow"><i>${ic}</i>${t}</span>`).join('')}</span>
     <span class="prof__btns">
       <a class="b b--gold" href="${SITE}">Visit site</a>
       ${c.phone ? `<a class="b b--wa" href="${waHref(c.phone)}" rel="noopener" target="_blank">${I.wa}Message</a>` : ''}
@@ -130,9 +134,6 @@
   const thumbs = panel('thumbs', SITE + '#projects', `
     <span class="thumbs">${pick.map(p => `<span class="thumb" style="background-image:url('../media/sectors/${esc(String(p.sector || 'enterprise').toLowerCase())}.jpg')"><b>${esc(p.name)}</b><small>${esc(p.sector || '')}</small></span>`).join('')}</span>`, ' p--bare');
 
-  // ---- likes
-  const likes = panel('likes', SITE + '#credentials', `<span class="reacts reacts--one">${I.heart}<b>${esc(talksStat)}</b></span>`, ' p--bare');
-
   // ---- new message
   const msg = panel('msg', c.phone ? waHref(c.phone) : (c.email ? mailHref(c.email) : SITE + '#contact'),
     `<span class="row">${c.phone ? I.wa : I.mail}<span><small>${c.phone ? 'WhatsApp me' : 'New message'}</small><b>Let's collaborate!</b></span></span>`);
@@ -149,7 +150,7 @@
     <svg class="growth" viewBox="0 0 ${W} ${H}"><path class="growth__area" d="${path} L${W - 4},${H - 4} L4,${H - 4} Z"/><path class="growth__line" d="${path}"/><circle class="growth__dot" cx="${W - 4}" cy="${H - 8 - (acc / mx) * (H - 16)}" r="2.5"/></svg>
     <span class="growth__axis"><em>${y0}</em><em>${Math.round((y0 + y1) / 2)}</em><em>${y1}</em></span>`);
 
-  ui.innerHTML = [profile, dash, insights, recog, trend, reacts, collab, fb, follower, thumbs, likes, msg, growth].join('');
+  ui.innerHTML = [profile, dash, insights, recog, trend, reacts, collab, fb, follower, thumbs, msg, growth].join('');
   [...ui.children].forEach((el, i) => el.style.setProperty('--i', i));
 
   // sparkles
