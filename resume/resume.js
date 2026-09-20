@@ -8,7 +8,7 @@
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const SITE = '../', FB = 'https://www.facebook.com/aidjudigital';
-  const AV = 'avatar.png?v=8'; // bump with index.html when the avatar is re-cropped, so caches refetch
+  const AV = 'avatar.png?v=9'; // bump with index.html when the avatar is re-cropped, so caches refetch
   // WhatsApp deep link: Malaysian local number -> international, no punctuation (016-772 5496 -> 60167725496)
   const waNumber = p => { const d = String(p || '').replace(/\D/g, ''); return d.startsWith('0') ? '6' + d : d; };
   const HELLO = "Hi Dr. Rahmat, I saw your digital resume and would like to talk about a talk / training / AI project.";
@@ -92,7 +92,7 @@
   const sectors = countBy(platforms, 'sector').sort((a, b) => b[1] - a[1]).slice(0, 5);
   const maxS = Math.max(1, ...sectors.map(s => s[1]));
   const pctMain = sup.length ? Math.round(main / sup.length * 100) : 0;
-  const insights = panel('insights', SITE + '#projects', `
+  const insights = panel('insights', SITE + '#academic', `
     <span class="p__head">Audience insights<i>${seeAll}</i></span>
     <span class="ins">
       <span class="ins__bars"><small>Top sectors</small>${sectors.map(([s, n]) => `<span class="bar"><em>${esc(s)}</em><span class="bar__track"><span class="bar__fill" style="--w:${n / maxS * 100}%"></span></span><b>${Math.round(n / platforms.length * 100)}%</b></span>`).join('')}</span>
@@ -109,7 +109,7 @@
     </span>`);
 
   // ---- trending -> now
-  const trend = panel('trend', SITE + '#contact', `
+  const trend = panel('trend', SITE + '#credentials', `
     <span class="p__head">This is trending! 🔥</span>
     <span class="trend"><span><small>Now</small><b>${esc(now ? now.text : 'Open for engagements')}</b>${now && now.until ? `<em>until ${esc(now.until)}</em>` : ''}</span>
     <svg class="trend__line" viewBox="0 0 80 40"><path d="M2 34 L18 26 L32 30 L48 16 L62 20 L78 6"/><path d="M66 6h12v12" class="trend__arrow"/></svg></span>`);

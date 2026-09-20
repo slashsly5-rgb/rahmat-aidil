@@ -795,8 +795,26 @@
   });
   document.querySelectorAll('.section').forEach(reveal);
 
+  // Deep links (#career, #projects, ...): sections are rendered by JS and ScrollTrigger re-measures
+  // afterwards, so the browser's own hash jump lands on stale positions. Re-apply it once things settle.
+  let lenis = null;
+  const NAV_GAP = 16; // the floating nav sits 12px from the top
+  function gotoHash(smooth) {
+    const id = decodeURIComponent((location.hash || '').slice(1));
+    const el = id && document.getElementById(id);
+    if (!el || el.hidden) return;
+    if (lenis) { lenis.scrollTo(el, { offset: -NAV_GAP, immediate: !smooth }); return; }
+    const y = el.getBoundingClientRect().top + window.scrollY - NAV_GAP;
+    window.scrollTo({ top: Math.max(0, y), behavior: smooth ? 'smooth' : 'auto' });
+  }
+  if (location.hash) {
+    const settle = () => { gotoHash(false); [400, 1200, 2400].forEach(ms => setTimeout(() => gotoHash(false), ms)); };
+    document.readyState === 'complete' ? settle() : addEventListener('load', settle);
+  }
+  addEventListener('hashchange', () => gotoHash(true));
+
   if (!reduced && window.Lenis && hasGsap) {
-    const lenis = new Lenis({ lerp: .1 });
+    lenis = new Lenis({ lerp: .1 });
     lenis.on('scroll', ScrollTrigger.update);
     gsap.ticker.add(t => lenis.raf(t * 1000));
     gsap.ticker.lagSmoothing(0);
@@ -806,7 +824,7 @@
       const a = e.target.closest('a[href^="#"]'); if (!a || !a.hash) return;
       const target = document.querySelector(a.hash); if (!target) return;
       e.preventDefault();
-      lenis.scrollTo(target, { offset: 0 });
+      lenis.scrollTo(target, { offset: -NAV_GAP });
       if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
       target.focus({ preventScroll: true });
     });
