@@ -570,7 +570,7 @@
     const el = document.getElementById('academic');
     if (!A) { hideSection(el, 'academic'); return; }
     const areas = A.areas || [], sup = A.supervision || [];
-    const pubs = A.publications || [], teaching = A.teaching || [];
+    const pubs = A.publications || [];
 
     // Research-area graph: nodes on an ellipse, links to a central hub.
     const W = 640, H = 360, cx = W / 2, cy = H / 2;
@@ -600,14 +600,11 @@
       </div></div>` : '';
     const areaChips = areas.length ? `<div class="area-chips">${areas.map(a => `<button class="chip area-chip" data-area="${esc(a.id)}" aria-pressed="false">${esc(a.label)}</button>`).join('')}</div>` : '';
 
-    // Five glass slabs (numbered, stepped stack); each opens a pane in the panel beside it.
-    const edu = (DATA.career && DATA.career.education) || [];
-    const phd = edu.find(e => /philosophy|phd/i.test(e.qualification)) || edu[0];
+    // Glass slabs (numbered, stepped stack); each opens a pane in the panel beside it.
     const main = sup.filter(s => !isCo(s)), co = sup.filter(isCo);
     const lvl = list => L.countBy(list, 'level').slice().reverse().map(([l, n]) => `${n} ${l}`).join(' · ');
     const rec = A.recognition;
     const ICON = {
-      cap: '<path d="M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/><path d="M22 10v6"/>',
       net: '<circle cx="12" cy="12" r="2.5"/><circle cx="4" cy="6" r="2"/><circle cx="20" cy="6" r="2"/><circle cx="4" cy="18" r="2"/><circle cx="20" cy="18" r="2"/><path d="M6 7l4 3M14 10l4-3M6 17l4-3M14 14l4 3"/>',
       people: '<circle cx="9" cy="8" r="3.2"/><circle cx="17" cy="9" r="2.4"/><path d="M3 20c0-3.5 2.7-6 6-6s6 2.5 6 6"/><path d="M15 20c0-2.6 1.6-4.6 4-5 1.2.3 2 1.4 2 3.5"/>',
       book: '<path d="M4 4h7a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H4z"/><path d="M20 4h-7a3 3 0 0 0-3 3v13a2 2 0 0 1 2-2h8z"/>',
@@ -615,7 +612,6 @@
       quill: '<path d="M4 20c6-1 10-4 13-10l3-7-7 3C7 9 5 13 4 20z"/><path d="M4 20l6-6"/>',
     };
     const slabs = [
-      phd && { id: 'edu', icon: 'cap', title: 'Doctorate', stat: '', sub: `${phd.qualification} · ${phd.institution}, ${phd.year}` },
       areas.length && { id: 'areas', icon: 'net', title: 'Research areas', stat: areas.length, sub: areas.slice(0, 4).map(x => x.label).join(', ') + (areas.length > 4 ? '…' : '') },
       main.length && { id: 'sup', icon: 'people', title: 'Postgraduate supervision', stat: main.length, sub: `Main supervisor · ${lvl(main)} · ongoing AI-integrated theses` },
       co.length && { id: 'co', icon: 'book', title: 'Co-supervision', stat: co.length, sub: `Co-supervisor · ${lvl(co)} · cross-faculty research` },
@@ -636,8 +632,6 @@
       </li>`).join('');
     const pane = (id, title, body) => `<section class="pane" id="pane-${id}" data-pane="${id}"${id === slabs[0].id ? '' : ' hidden'}><h3 class="pane__title">${esc(title)}</h3>${body}</section>`;
     const panes = [
-      phd && pane('edu', 'Education', `<ol class="edu">${edu.map(e => `<li class="edu__row"><span class="edu__year">${esc(e.year)}</span><div><p class="edu__q">${esc(e.qualification)}</p><p class="muted small">${[e.institution, e.focus].filter(Boolean).map(esc).join(' · ')}</p></div></li>`).join('')}</ol>` +
-        (teaching.length ? `<h4 class="pane__sub">Courses taught</h4><ul class="courses">${teaching.map(c => `<li><b>${esc(c.code)}</b><span>${esc(c.title)}</span></li>`).join('')}</ul>` : '')),
       areas.length && pane('areas', 'Research areas', `<div class="acad__graph">${graph}<p class="muted small">Node size = number of supervised theses in that area.</p></div>`),
       main.length && pane('sup', 'Postgraduate supervision', `${roleBox('Main supervisor', main)}${areaChips}<div class="scards">${supCard(main)}</div>`),
       co.length && pane('co', 'Co-supervision', `${roleBox('Co-supervisor', co)}<div class="scards">${supCard(co)}</div>`),
@@ -678,7 +672,16 @@
       if (reduced) return;
       el.querySelectorAll('.slab__stat').forEach((n, i) => {
         const to = +n.dataset.count, t0 = performance.now() + 500 + i * 140;
-        (function tick(now) { const k = Math.min(1, Math.max(0, (now - t0) / 900)); n.textContent = Math.round(to * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(tick); })(t0);
+        // started from the first real frame, never called synchronously: calling it up front
+        // wrote 0 into the element, so the stat stuck at 0 wherever frames never arrive
+        requestAnimationFrame(function tick(now) {
+          // hold the real number until the count-up actually starts: writing 0 up front left the
+          // stat reading 0 for good wherever frames never arrive
+          if (now < t0) { requestAnimationFrame(tick); return; }
+          const k = Math.min(1, (now - t0) / 900);
+          n.textContent = Math.round(to * (1 - Math.pow(1 - k, 3)));
+          if (k < 1) requestAnimationFrame(tick);
+        });
       });
     }, { threshold: .25 }).observe(stack);
 
