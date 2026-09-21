@@ -767,28 +767,84 @@
       <p class="talk__t">${esc(t.title)}</p>
       ${[t.org, t.place, t.audience].some(Boolean) ? `<p class="muted small">${[t.org, t.place, t.audience].filter(Boolean).map(esc).join(' · ')}</p>` : ''}
       </li>`;
-    // Training catalogue: what he can be booked to deliver. Each card opens its syllabus.
+    // Training catalogue: what he can be booked to deliver, as a hub feeding four families of
+    // programme. Clicking a family node filters the grid; each card opens its own syllabus.
     const T = DATA.training || {}, progs = T.programmes || [];
-    const detail = (label, items) => items && items.length
-      ? `<h5>${esc(label)}</h5><ul>${items.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : '';
+    const FAMILY = [
+      { id: 'ai', label: 'AI & Automation', hue: '#a855f7', icon: 'spark',
+        test: /\bAI\b|Artificial|Automat|Predictive|Machine Learning|Chatbot/i },
+      { id: 'studio', label: 'Creative Studio', hue: '#ec4899', icon: 'wand',
+        test: /Photoshop|After Effects|Illustrator|vMix|Blender|Content Creation|Video|Graphic/i },
+      { id: 'data', label: 'Data & Code', hue: '#22d3ee', icon: 'chart',
+        test: /Data|Pivot|Coding|Accounting|Analytics|Google Form|Report/i },
+      { id: 'commerce', label: 'Digital Commerce', hue: '#19e39b', icon: 'cart',
+        test: /TikTok|Instagram|Facebook|Google Ads|SEO|Website|Wordpress|Shopee|Lazada|Alibaba|Dropship|Commerce|Marketing|Entrepreneur|WhatsApp|Telegram/i },
+    ];
+    // first family whose test matches; commerce is the catch-all since it is the broadest
+    const familyOf = p2 => (FAMILY.find(f => f.test.test(p2.name)) || FAMILY[3]).id;
+    const tagged = progs.map(p2 => ({ ...p2, fam: familyOf(p2) }));
+    const famCount = id => tagged.filter(p2 => p2.fam === id).length;
+    const FAM_ICON = {
+      spark: '<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M18 15l.8 2.2L21 18l-2.2.8L18 21l-.8-2.2L15 18l2.2-.8z"/>',
+      wand: '<path d="M4 20L15 9M13 4l1 2 2 1-2 1-1 2-1-2-2-1 2-1zM19 9l.7 1.4 1.4.7-1.4.7-.7 1.4-.7-1.4-1.4-.7 1.4-.7z"/>',
+      chart: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+      cart: '<path d="M3 4h2l2.4 11h10.2L20 7H7"/><circle cx="9" cy="19" r="1.6"/><circle cx="16" cy="19" r="1.6"/>',
+    };
+    const famIcon = k => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${FAM_ICON[k]}</svg>`;
+
+    // Wires run from the bottom of the core down to the top of each node. The viewBox is stretched
+    // to the hub's box, so the stroke is kept honest with vector-effect="non-scaling-stroke".
+    const NODE_X = [12, 37.3, 62.7, 88];
+    const wires = FAMILY.map((f, i) => {
+      const x = NODE_X[i];
+      return `<path class="cat__wire" vector-effect="non-scaling-stroke" style="--hue:${f.hue};--i:${i}"
+        d="M50 46 C 50 ${58 + i % 2 * 4}, ${x} ${56 - Math.abs(50 - x) * .08}, ${x} 72" />`;
+    }).join('');
+
+    const detail = (lab, items) => items && items.length
+      ? `<h5>${esc(lab)}</h5><ul>${items.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : '';
+
     const catalogueHTML = progs.length ? `
-      <div class="cat">
-        <div class="talks__head">
-          <h3>Training programmes</h3>
-          <p class="muted small"><b>${progs.length}</b> ready-to-run programmes${T.audience && T.audience.length ? ` · ${T.audience.length} audience types` : ''} · typically ${esc(progs[0].pax || '20 - 30')} participants</p>
+      <section class="cat" aria-labelledby="cat-h">
+        <div class="cat__head">
+          <p class="eyebrow">Training programmes</p>
+          <h3 id="cat-h">${progs.length} programmes, ready to run</h3>
+          <p class="cat__lede">Built and delivered by Dr. Rahmat — ${tagged.reduce((n, p2) => n + p2.topics.length, 0)} topics across four families, for groups of ${esc(progs[0].pax || '20 - 30')}.</p>
         </div>
-        <ul class="cat__grid">${progs.map((p, i) => `
-          <li class="cat__item">
-            <details class="cat__card"${i < 0 ? ' open' : ''}>
+
+        <div class="cat__hub">
+          <svg class="cat__wires" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${wires}</svg>
+          <div class="cat__core">
+            <span class="cat__core-ring" aria-hidden="true"></span>
+            <b>${progs.length}</b><span>programmes</span>
+          </div>
+          <div class="cat__nodes" role="group" aria-label="Filter by family">
+            ${FAMILY.map((f, i) => `<button class="cat__node" type="button" data-fam="${f.id}" aria-pressed="false" style="--hue:${f.hue};--i:${i}">
+              <span class="cat__node-ico">${famIcon(f.icon)}</span>
+              <span class="cat__node-txt"><b>${esc(f.label)}</b><em>${famCount(f.id)} programmes</em></span>
+            </button>`).join('')}
+          </div>
+        </div>
+
+        <ul class="cat__grid">${tagged.map((p2, i) => {
+          const f = FAMILY.find(x => x.id === p2.fam);
+          return `<li class="cat__item" data-fam="${p2.fam}" style="--hue:${f.hue};--i:${i % 12}">
+            <details class="cat__card">
               <summary>
-                <b>${esc(p.name)}</b>
-                <span class="muted small">${p.topics.length} topics${p.pax ? ` · ${esc(p.pax)} pax` : ''}</span>
+                <span class="cat__ico">${famIcon(f.icon)}</span>
+                <span class="cat__sum">
+                  <b>${esc(p2.name)}</b>
+                  <em>${p2.topics.length} topics${p2.pax ? ` \u00b7 ${esc(p2.pax)} pax` : ''}</em>
+                </span>
+                <span class="cat__plus" aria-hidden="true"></span>
               </summary>
-              <div class="cat__body">${detail('Topics covered', p.topics)}${detail('Outcomes', p.objectives)}</div>
+              <div class="cat__body">${detail('Topics covered', p2.topics)}${detail('Outcomes', p2.objectives)}</div>
             </details>
-          </li>`).join('')}</ul>
-        ${T.audience && T.audience.length ? `<p class="cat__aud muted small"><b>Who it is for:</b> ${T.audience.map(esc).join(' · ')}</p>` : ''}
-      </div>` : '';
+          </li>`;
+        }).join('')}</ul>
+        <p class="cat__empty" hidden>No programmes in that family.</p>
+        ${T.audience && T.audience.length ? `<p class="cat__aud"><b>Who it is for</b> ${T.audience.map(esc).join(' \u00b7 ')}</p>` : ''}
+      </section>` : '';
 
     const LEAD = 10;
     const ordered = [...upcoming, ...past];
@@ -905,6 +961,39 @@
         py = (ev.clientY - r.top) / r.height * 2 - 1;
       });
       orbit.addEventListener('pointerleave', () => { px = 0; py = 0; });
+    }
+
+    // Family filter. Nothing here hides a card by default: without JS every card stays visible.
+    const cat = el.querySelector('.cat');
+    if (cat) {
+      const items = [...cat.querySelectorAll('.cat__item')];
+      const nodes = [...cat.querySelectorAll('.cat__node')];
+      const empty = cat.querySelector('.cat__empty');
+      let active = null;
+      const apply = () => {
+        let shown = 0;
+        items.forEach(li => {
+          const on = !active || li.dataset.fam === active;
+          li.classList.toggle('is-out', !on);
+          shown += on;
+        });
+        nodes.forEach(n => {
+          const on = n.dataset.fam === active;
+          n.classList.toggle('is-active', on);
+          n.setAttribute('aria-pressed', String(on));
+        });
+        cat.classList.toggle('is-filtered', !!active);
+        empty.hidden = shown > 0;
+        refreshSoon();
+      };
+      nodes.forEach(n => n.addEventListener('click', () => {
+        active = active === n.dataset.fam ? null : n.dataset.fam;
+        apply();
+      }));
+      // entrance is transform-only, so a card is never hidden by a missed callback
+      new IntersectionObserver(([e], io) => {
+        if (!e.isIntersecting) return; io.disconnect(); cat.classList.add('is-in');
+      }, { threshold: .08 }).observe(cat);
     }
 
     const more = el.querySelector('.talks__more'), rest = el.querySelector('.talks__list--more');
