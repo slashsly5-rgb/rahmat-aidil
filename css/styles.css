@@ -613,10 +613,9 @@ a { color: inherit; }
 .orbit__space { position: relative; width: 100%; aspect-ratio: 16 / 10; perspective: 1250px;
   perspective-origin: 50% 45%; --px: 0; --py: 0; }
 .orbit__figure { position: absolute; left: 50%; bottom: 0; height: 100%; width: auto; max-width: none;
-  transform: translateX(-50%); z-index: 3; opacity: 0; transition: opacity .9s ease .1s;
+  transform: translateX(-50%); z-index: 3;
   filter: brightness(1.22) contrast(1.06) saturate(1.05)
     drop-shadow(0 0 16px rgba(34, 211, 238, .34)) drop-shadow(0 26px 46px rgba(0, 0, 0, .8)); }
-.orbit.is-in .orbit__figure { opacity: 1; }
 .orbit__spot { position: absolute; left: 50%; top: 2%; width: 58%; height: 96%; z-index: 2; pointer-events: none;
   transform: translateX(-50%); border-radius: 50%;
   background: radial-gradient(46% 44% at 50% 34%, rgba(34, 211, 238, .3), transparent 68%),
@@ -652,13 +651,12 @@ a { color: inherit; }
   background: linear-gradient(150deg, rgba(255, 255, 255, .4), rgba(176, 214, 226, .2) 46%, rgba(14, 40, 49, .45));
   backdrop-filter: blur(11px) saturate(1.3); -webkit-backdrop-filter: blur(11px) saturate(1.3);
   box-shadow: 0 22px 44px rgba(0, 0, 0, .55), inset 0 1px 0 rgba(255, 255, 255, .55),
-    inset 0 0 0 1px rgba(255, 255, 255, .06), 0 0 30px color-mix(in srgb, var(--hue) 34%, transparent);
-  opacity: 0; }
+    inset 0 0 0 1px rgba(255, 255, 255, .06), 0 0 30px color-mix(in srgb, var(--hue) 34%, transparent); }
 .ocard__card::after { content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
   background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, .26) 45%, transparent 58%); }
-.orbit.is-in .ocard__card { animation: ocard-in .7s ease calc(var(--i) * 95ms) both; }
-/* an entrance always needs an explicit `to`: an implicit one resolves to the element's own opacity: 0 */
-@keyframes ocard-in { from { opacity: 0; } to { opacity: 1; } }
+/* No fade-in on the cards. A staggered opacity entrance left the whole stage blank twice: once
+   when its keyframes resolved to opacity 0, once when the class that triggered it never arrived.
+   The drift is the life here; the cards are simply visible. */
 
 .ocard__top { display: grid; grid-template-columns: 42px 1fr 18px; align-items: center; gap: 9px; }
 .ocard__art { display: block; width: 42px; height: 42px; border-radius: 8px; overflow: hidden;
@@ -694,14 +692,13 @@ a { color: inherit; }
 
 .mote { position: absolute; left: calc(var(--x) * 1%); top: calc(var(--y) * 1%); z-index: 4;
   transform: translate3d(calc(var(--px, 0) * var(--d) * 18px), calc(var(--py, 0) * var(--d) * 14px), 0);
-  opacity: 0; }
+  opacity: .9; }
 .mote__drift { display: flex; align-items: center; gap: 3px; height: 40px; }
 .mote--eq { --hue: #19e39b; }
 .mote--eq .mote__drift { gap: 4px; }
 .mote--eq i { width: 5px; }
 .mote--wave { --hue: #22d3ee; }
 .mote--wave .mote__drift { height: 30px; }
-.orbit.is-in .mote { animation: ocard-in .7s ease calc(.45s + var(--i) * 130ms) both; }
 .mote__drift { animation: ocard-drift calc(5s + var(--i) * .6s) ease-in-out calc(var(--i) * -1.9s) infinite; }
 
 @media (max-width: 1100px) {
@@ -722,6 +719,5 @@ a { color: inherit; }
 @media (prefers-reduced-motion: reduce) {
   .ocard__drift, .mote__drift,
   .orbit.is-in .ocard__wave i, .orbit.is-in .mote i { animation: none; }
-  .orbit.is-in .ocard__card, .orbit.is-in .mote { animation: none; opacity: 1; }
-  .orbit__figure { opacity: 1; transition: none; }
+  .orbit.is-in .ocard__wave i { animation: none; }
 }
