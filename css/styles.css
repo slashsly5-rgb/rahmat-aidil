@@ -599,8 +599,8 @@ a { color: inherit; }
 .cat__aud b { color: #fff; }
 
 /* ---- credentials: cards orbiting the bobblehead (2026-09-21) ----
-   Per card: .ocard positions and tilts, .ocard__drift carries the continuous motion,
-   .ocard__card fades in. Each element owns one animatable property, so none of them fight. */
+   The path is set per frame in JS (see `place` in app.js): CSS keyframes cannot move a card
+   around the subject and also change its stacking order as it passes behind him. */
 .orbit { position: relative; margin-top: 8px; }
 .orbit__glow { position: absolute; inset: -6% -4% 34px; pointer-events: none; border-radius: 28px;
   background:
@@ -611,7 +611,7 @@ a { color: inherit; }
     radial-gradient(70% 60% at 50% 62%, rgba(37, 99, 235, .15), transparent 72%),
     radial-gradient(120% 90% at 50% 100%, rgba(5, 11, 16, .88), transparent 60%); }
 .orbit__space { position: relative; width: 100%; aspect-ratio: 16 / 10; perspective: 1250px;
-  perspective-origin: 50% 45%; --px: 0; --py: 0; }
+  perspective-origin: 50% 45%; }
 .orbit__figure { position: absolute; left: 50%; bottom: 0; height: 100%; width: auto; max-width: none;
   transform: translateX(-50%); z-index: 3;
   filter: brightness(1.22) contrast(1.06) saturate(1.05)
@@ -621,31 +621,13 @@ a { color: inherit; }
   background: radial-gradient(46% 44% at 50% 34%, rgba(34, 211, 238, .3), transparent 68%),
     radial-gradient(62% 56% at 50% 62%, rgba(37, 99, 235, .26), transparent 72%);
   filter: blur(18px); }
-.orbit__cap { position: relative; z-index: 5; margin: 4px 0 0; text-align: center; color: var(--text); font-size: 14.5px; }
+.orbit__cap { position: relative; z-index: 7; margin: 4px 0 0; text-align: center; color: var(--text); font-size: 14.5px; }
 .orbit__cap b { color: var(--cyan); font-family: var(--f-mono); font-size: 17px; text-shadow: 0 0 18px rgba(34, 211, 238, .55); }
 
-/* 1. positioner: tilt + pointer parallax + depth scale. Never animated. */
-.ocard { position: absolute; left: calc(var(--x) * 1%); top: calc(var(--y) * 1%); width: calc(var(--w) * 1%);
-  z-index: var(--z); transform-style: preserve-3d;
-  transform:
-    translate3d(calc(var(--px, 0) * var(--d) * 16px), calc(var(--py, 0) * var(--d) * 13px), 0)
-    rotateY(calc(var(--rot) * -1deg)) rotateX(calc(var(--py, 0) * 4deg))
-    scale(calc(.9 + var(--d) * .1)); }
-
-/* 2. drift: the hovering. Large enough to read at a glance, each card on its own phase. */
-.ocard__drift { display: block; transform-style: preserve-3d; will-change: transform; }
-/* ungated: the drift runs as soon as the card exists, whatever the observer does */
-.ocard__drift { animation: ocard-drift calc(5.5s + var(--i) * .45s) ease-in-out calc(var(--i) * -1.3s) infinite; }
-/* an orbit around the resting position: it drifts down as well as up, so the card's average
-   place stays where it was laid out and nothing creeps into the heading */
-@keyframes ocard-drift {
-  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
-  25% { transform: translate3d(calc(var(--d) * 46px), calc(var(--d) * -54px), 0) rotate(calc(var(--d) * 2.6deg)); }
-  50% { transform: translate3d(calc(var(--d) * 16px), calc(var(--d) * 50px), 0) rotate(calc(var(--d) * -1.4deg)); }
-  75% { transform: translate3d(calc(var(--d) * -52px), calc(var(--d) * -24px), 0) rotate(calc(var(--d) * -2.4deg)); }
-}
-
-/* 3. the glass itself: fades in, nothing else. */
+/* JS writes transform / z-index / opacity on .ocard every frame. Nothing here hides it: if the
+   script never runs the card simply sits at the stage origin, visible. */
+.ocard { position: absolute; left: 0; top: 0; width: calc(var(--w) * 1%); z-index: 4;
+  transform-style: preserve-3d; will-change: transform; }
 .ocard__card { position: relative; display: block; padding: 11px 12px; border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, .42);
   background: linear-gradient(150deg, rgba(255, 255, 255, .4), rgba(176, 214, 226, .2) 46%, rgba(14, 40, 49, .45));
@@ -654,18 +636,15 @@ a { color: inherit; }
     inset 0 0 0 1px rgba(255, 255, 255, .06), 0 0 30px color-mix(in srgb, var(--hue) 34%, transparent); }
 .ocard__card::after { content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
   background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, .26) 45%, transparent 58%); }
-/* No fade-in on the cards. A staggered opacity entrance left the whole stage blank twice: once
-   when its keyframes resolved to opacity 0, once when the class that triggered it never arrived.
-   The drift is the life here; the cards are simply visible. */
 
 .ocard__top { display: grid; grid-template-columns: 42px 1fr 18px; align-items: center; gap: 9px; }
 .ocard__art { display: block; width: 42px; height: 42px; border-radius: 8px; overflow: hidden;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), 0 3px 10px rgba(0, 0, 0, .45); }
 .ocard__art img { width: 100%; height: 100%; object-fit: cover; }
 .ocard__meta { min-width: 0; }
-.ocard__title { display: block; font: 600 13.5px/1.25 var(--f-display); color: #fff;
+.ocard__title { display: block; font: 600 13px/1.25 var(--f-display); color: #fff;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ocard__sub { display: block; margin-top: 1px; font-size: 11.5px; line-height: 1.2; color: #dceaf0;
+.ocard__sub { display: block; margin-top: 1px; font-size: 11px; line-height: 1.2; color: #dceaf0;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ocard__badge { width: 18px; height: 18px; display: grid; place-items: center; border-radius: 50%;
   background: var(--emerald); color: #04121a; }
@@ -686,20 +665,15 @@ a { color: inherit; }
 .ocard__wave { display: flex; align-items: center; gap: 2px; height: 22px; flex: 1; min-width: 0; overflow: hidden; }
 
 .ocard__wave i, .mote i { display: block; width: 2px; border-radius: 2px; height: var(--h);
-  background: color-mix(in srgb, var(--hue, #22d3ee) 70%, #fff); opacity: .85; }
-.orbit.is-in .ocard__wave i, .orbit.is-in .mote i { animation: bar-eq calc(1s + (var(--i) % 5) * .22s) ease-in-out calc(var(--i) * -.13s) infinite alternate; }
+  background: color-mix(in srgb, var(--hue, #22d3ee) 70%, #fff); opacity: .85;
+  animation: bar-eq calc(1s + (var(--i) % 5) * .22s) ease-in-out calc(var(--i) * -.13s) infinite alternate; }
 @keyframes bar-eq { from { transform: scaleY(.42); } to { transform: scaleY(1); } }
 
-.mote { position: absolute; left: calc(var(--x) * 1%); top: calc(var(--y) * 1%); z-index: 4;
-  transform: translate3d(calc(var(--px, 0) * var(--d) * 18px), calc(var(--py, 0) * var(--d) * 14px), 0);
-  opacity: .9; }
-.mote__drift { display: flex; align-items: center; gap: 3px; height: 40px; }
-.mote--eq { --hue: #19e39b; }
-.mote--eq .mote__drift { gap: 4px; }
+.mote { position: absolute; left: 0; top: 0; z-index: 4; display: flex; align-items: center; gap: 3px;
+  height: 40px; will-change: transform; }
+.mote--eq { --hue: #19e39b; gap: 4px; }
 .mote--eq i { width: 5px; }
-.mote--wave { --hue: #22d3ee; }
-.mote--wave .mote__drift { height: 30px; }
-.mote__drift { animation: ocard-drift calc(5s + var(--i) * .6s) ease-in-out calc(var(--i) * -1.9s) infinite; }
+.mote--wave { --hue: #22d3ee; height: 30px; }
 
 @media (max-width: 1100px) {
   .ocard__sub { display: none; }
@@ -717,7 +691,5 @@ a { color: inherit; }
   .orbit { display: none; } /* the plain .cred-list takes over */
 }
 @media (prefers-reduced-motion: reduce) {
-  .ocard__drift, .mote__drift,
-  .orbit.is-in .ocard__wave i, .orbit.is-in .mote i { animation: none; }
-  .orbit.is-in .ocard__wave i { animation: none; }
+  .ocard__wave i, .mote i { animation: none; }
 }

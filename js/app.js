@@ -705,28 +705,29 @@
   }
 
   // ---------- credentials: cards orbiting the bobblehead ----------
-  // x/y/w are % of the stage, rot is the 3D tilt, d is depth (drives drift distance, parallax and
-  // scale) and z puts the card in front of the figure (4) or behind it (2). `art` indexes ART.
+  // Each card runs a closed ellipse around the subject. cx/cy is the centre of its ring and rx/ry
+  // its radii, all as % of the stage; `t` is seconds for one full revolution and `phase` where on
+  // the ring it starts (0-1). Three rings at different heights keep the whole frame busy.
   const ORBIT = [
-    { x: 4, y: 9, w: 27, rot: 15, d: 1.05, z: 4, face: 'transport' },
-    { x: 57, y: 6, w: 28, rot: -16, d: 0.80, z: 4, face: 'wave' },
-    { x: 2, y: 30, w: 26, rot: 19, d: 1.28, z: 4, face: 'wave' },
-    { x: 68, y: 25, w: 27, rot: -13, d: 0.92, z: 4, face: 'transport' },
-    { x: 7, y: 54, w: 29, rot: 12, d: 1.18, z: 4, face: 'transport' },
-    { x: 62, y: 49, w: 28, rot: -17, d: 1.32, z: 4, face: 'wave' },
-    { x: 27, y: 73, w: 27, rot: 7, d: 1.00, z: 4, face: 'wave' },
-    { x: 59, y: 71, w: 26, rot: -9, d: 0.88, z: 4, face: 'transport' },
-    { x: 20, y: 17, w: 23, rot: 21, d: 0.66, z: 2, face: 'mini' },
-    { x: 46, y: 1, w: 21, rot: -5, d: 0.58, z: 2, face: 'mini' },
+    { cx: 50, cy: 23, rx: 35, ry: 9, t: 27, phase: 0.02, w: 25 },
+    { cx: 50, cy: 23, rx: 35, ry: 9, t: 27, phase: 0.40, w: 25 },
+    { cx: 50, cy: 25, rx: 33, ry: 8, t: 31, phase: 0.72, w: 24 },
+    { cx: 50, cy: 50, rx: 38, ry: 13, t: 23, phase: 0.10, w: 27 },
+    { cx: 50, cy: 50, rx: 38, ry: 13, t: 23, phase: 0.36, w: 27 },
+    { cx: 50, cy: 50, rx: 38, ry: 13, t: 23, phase: 0.62, w: 27 },
+    { cx: 50, cy: 52, rx: 36, ry: 12, t: 29, phase: 0.86, w: 26 },
+    { cx: 50, cy: 76, rx: 32, ry: 8, t: 25, phase: 0.22, w: 26 },
+    { cx: 50, cy: 76, rx: 32, ry: 8, t: 25, phase: 0.55, w: 26 },
+    { cx: 50, cy: 78, rx: 30, ry: 7, t: 33, phase: 0.88, w: 24 },
   ];
   // Square sector renders double as the cards' album art, like the thumbnails in the reference.
   const ART = ['energy', 'enterprise', 'education', 'government', 'hr', 'legal', 'tourism', 'logistics', 'infrastructure'];
-  // Loose widgets that drift alongside the cards.
+  // Loose widgets, on their own small rings.
   const MOTES = [
-    { cls: 'eq', x: 37, y: 4, d: 0.7 },
-    { cls: 'wave', x: 53, y: 30, d: 1.1 },
-    { cls: 'eq', x: 33, y: 62, d: 0.9 },
-    { cls: 'wave', x: 40, y: 88, d: 0.8 },
+    { cls: 'eq', cx: 50, cy: 14, rx: 22, ry: 5, t: 19, phase: 0.55 },
+    { cls: 'wave', cx: 50, cy: 40, rx: 27, ry: 9, t: 21, phase: 0.25 },
+    { cls: 'eq', cx: 50, cy: 64, rx: 24, ry: 7, t: 17, phase: 0.80 },
+    { cls: 'wave', cx: 50, cy: 88, rx: 20, ry: 5, t: 23, phase: 0.05 },
   ];
   function renderCredentials() {
     const C = DATA.credentials;
@@ -811,35 +812,33 @@
     };
     const glyph = (k, cls) => `<svg class="${cls}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${GLYPH[k]}</svg>`;
 
-    // One floating player card. Three nested elements so position, drift and fade never share a transform.
+    // One orbiting player card. JS sets its transform, z-index and opacity every frame.
     const card = (c, i) => {
       const o = ORBIT[i];
-      const deck = o.face === 'transport'
-        ? `<div class="ocard__deck">${glyph('prev', 'ocard__skip')}<span class="ocard__play">${glyph('play', '')}</span>${glyph('next', 'ocard__skip')}<span class="ocard__year">${esc(c.year)}</span></div>
-           <span class="ocard__track"><i style="--p:${48 + i * 5}%"></i></span>`
-        : o.face === 'mini'
-          ? `<span class="ocard__track"><i style="--p:${40 + i * 6}%"></i></span>`
+      const deck = i % 3 === 2
+        ? `<span class="ocard__track"><i style="--p:${40 + i * 6}%"></i></span>`
+        : i % 2 === 0
+          ? `<div class="ocard__deck">${glyph('prev', 'ocard__skip')}<span class="ocard__play">${glyph('play', '')}</span>${glyph('next', 'ocard__skip')}<span class="ocard__year">${esc(c.year)}</span></div>
+             <span class="ocard__track"><i style="--p:${48 + i * 5}%"></i></span>`
           : `<div class="ocard__deck ocard__deck--wave"><span class="ocard__play ocard__play--sm">${glyph('play', '')}</span><span class="ocard__wave">${bars(20, i + 3)}</span><span class="ocard__year">${esc(c.year)}</span></div>`;
-      return `<div class="ocard" style="--x:${o.x};--y:${o.y};--w:${o.w};--rot:${o.rot};--d:${o.d};--z:${o.z};--hue:${HUES[i % HUES.length]};--i:${i}">
-        <div class="ocard__drift">
-          <article class="ocard__card">
-            <div class="ocard__top">
-              <span class="ocard__art"><img src="media/sectors/${ART[i % ART.length]}.jpg" alt="" width="480" height="480" loading="lazy" decoding="async"></span>
-              <span class="ocard__meta">
-                <b class="ocard__title">${esc(c.short || c.title)}</b>
-                <span class="ocard__sub">${esc(c.org || c.issuer)}</span>
-              </span>
-              <span class="ocard__badge" title="${esc(c.kind === 'talk' ? 'Invited' : cap(c))}">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
-              </span>
-            </div>
-            ${deck}
-          </article>
-        </div>
+      return `<div class="ocard" style="--w:${o.w};--hue:${HUES[i % HUES.length]};--i:${i}">
+        <article class="ocard__card">
+          <div class="ocard__top">
+            <span class="ocard__art"><img src="media/sectors/${ART[i % ART.length]}.jpg" alt="" width="480" height="480" decoding="async"></span>
+            <span class="ocard__meta">
+              <b class="ocard__title">${esc(c.short || c.title)}</b>
+              <span class="ocard__sub">${esc(c.org || c.issuer)}</span>
+            </span>
+            <span class="ocard__badge" title="${esc(c.kind === 'talk' ? 'Invited' : cap(c))}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+            </span>
+          </div>
+          ${deck}
+        </article>
       </div>`;
     };
 
-    const motes = MOTES.map((m, i) => `<span class="mote mote--${m.cls}" style="--x:${m.x};--y:${m.y};--d:${m.d};--i:${i}" aria-hidden="true"><span class="mote__drift">${m.cls === 'eq' ? bars(7, i + 1) : bars(24, i + 9)}</span></span>`).join('');
+    const motes = MOTES.map((m, i) => `<span class="mote mote--${m.cls}" style="--i:${i}" aria-hidden="true">${m.cls === 'eq' ? bars(7, i + 1) : bars(24, i + 9)}</span>`).join('');
 
     const list = certs.map((c, i) => `
       <li class="cl" style="--hue:${HUES[i % HUES.length]}"><span class="cl__icon">${svgIcon(c.icon)}</span>
@@ -861,27 +860,53 @@
       ${talksHTML}`;
 
     const orbit = el.querySelector('.orbit'), space = el.querySelector('.orbit__space');
-    // Marked in-view immediately, not on an IntersectionObserver. The observer does not fire in a
-    // tab that is not rendering (backgrounded, occluded), and this class gates the cards' opacity:
-    // when it never arrived the whole stage stayed blank and frozen.
-    orbit.classList.add('is-in');
+    const nodes = [...el.querySelectorAll('.ocard')], moteEls = [...el.querySelectorAll('.mote')];
+    const rings = [...ORBIT, ...MOTES];
+    const all = [...nodes, ...moteEls];
+    let px = 0, py = 0; // pointer parallax, -1..1
 
-    // Pointer parallax: the stage keeps --px/--py in the -1..1 range, each card multiplies by its depth.
-    if (!reduced && matchMedia('(hover: hover)').matches) {
-      let raf = 0;
-      orbit.addEventListener('pointermove', ev => {
-        if (raf) return;
-        raf = requestAnimationFrame(() => {
-          raf = 0;
-          const r = orbit.getBoundingClientRect();
-          space.style.setProperty('--px', ((ev.clientX - r.left) / r.width * 2 - 1).toFixed(3));
-          space.style.setProperty('--py', ((ev.clientY - r.top) / r.height * 2 - 1).toFixed(3));
-        });
-      });
-      orbit.addEventListener('pointerleave', () => {
-        space.style.setProperty('--px', 0); space.style.setProperty('--py', 0);
+    // Places every card for a given time. Exposed on the element so it can be driven to an exact
+    // moment when checking the motion, instead of sampling wall-clock and hoping the tab renders.
+    function place(ms) {
+      const W = space.clientWidth, H = space.clientHeight;
+      if (!W) return;
+      all.forEach((n, i) => {
+        const o = rings[i];
+        const ang = ((ms / 1000 / o.t) + o.phase) * Math.PI * 2;
+        const x = (o.cx / 100) * W + Math.cos(ang) * (o.rx / 100) * W;
+        const y = (o.cy / 100) * H + Math.sin(ang) * (o.ry / 100) * H;
+        // sin = +1 at the near side of the ring, -1 at the far side behind the subject
+        const near = (Math.sin(ang) + 1) / 2;
+        const scale = 0.74 + near * 0.34;
+        const tilt = -Math.cos(ang) * 16;
+        n.style.transform = `translate3d(${(x - n.offsetWidth / 2 + px * 14 * near).toFixed(1)}px, ${(y - n.offsetHeight / 2 + py * 11 * near).toFixed(1)}px, 0) rotateY(${tilt.toFixed(1)}deg) scale(${scale.toFixed(3)})`;
+        n.style.zIndex = near > 0.5 ? 6 : 1;          // in front of the figure, or behind it
+        n.style.opacity = (0.55 + near * 0.45).toFixed(2);
       });
     }
+    orbit.__place = place;
+    window.__ORBIT_RINGS = rings; // ring geometry, for checking the paths
+
+    let raf = 0;
+    const loop = t => { place(t); raf = requestAnimationFrame(loop); };
+    if (reduced) place(0); else raf = requestAnimationFrame(loop);
+    addEventListener('resize', () => place(performance.now()), { passive: true });
+    // stop the loop while the section is off-screen
+    new IntersectionObserver(([e]) => {
+      if (reduced) return;
+      if (e.isIntersecting && !raf) raf = requestAnimationFrame(loop);
+      else if (!e.isIntersecting && raf) { cancelAnimationFrame(raf); raf = 0; }
+    }, { threshold: 0 }).observe(orbit);
+
+    if (!reduced && matchMedia('(hover: hover)').matches) {
+      orbit.addEventListener('pointermove', ev => {
+        const r = orbit.getBoundingClientRect();
+        px = (ev.clientX - r.left) / r.width * 2 - 1;
+        py = (ev.clientY - r.top) / r.height * 2 - 1;
+      });
+      orbit.addEventListener('pointerleave', () => { px = 0; py = 0; });
+    }
+
     const more = el.querySelector('.talks__more'), rest = el.querySelector('.talks__list--more');
     more && more.addEventListener('click', () => {
       const open = rest.hidden;
