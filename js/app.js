@@ -760,13 +760,83 @@
     const cap = c => c.code && c.code.length <= 12 ? `Cert. ${c.code}` : 'Certified';
     const at = (x, y) => `left:${x}%;top:${y}%`;
 
-    // Talks & trainings: newest dated first, undated ones after (L.splitByDate), grouped by year.
+    // Talks & trainings, as a hub feeding four audience families. Newest dated first, undated
+    // after (L.splitByDate); the dates order the list and are never shown.
     const talks = C.talks || [];
-    const { upcoming, past } = L.splitByDate(talks); // dates order the list; they are not shown
-    const talkLI = t => `<li class="talk">
-      <p class="talk__t">${esc(t.title)}</p>
-      ${[t.org, t.place, t.audience].some(Boolean) ? `<p class="muted small">${[t.org, t.place, t.audience].filter(Boolean).map(esc).join(' · ')}</p>` : ''}
-      </li>`;
+    const { upcoming, past } = L.splitByDate(talks);
+    const ordered = [...upcoming, ...past];
+
+    const AUDIENCE = [
+      { id: 'intl', label: 'International', hue: '#ec4899', icon: 'globe',
+        test: /Indonesia|India\b|LPU|Lovely Professional|Hends|Universitas|Bangka|International/i },
+      { id: 'edu', label: 'Schools & campuses', hue: '#a855f7', icon: 'cap',
+        test: /School|Sekolah|Teacher|Guru|Student|Universit|College|Kolej|UTS|UCTS|Lecturer|Convocation|Pendidikan|Pilley|i-CATS|Education|Pelajar|Institut/i },
+      { id: 'gov', label: 'Government & agencies', hue: '#22d3ee', icon: 'building',
+        test: /Jabatan|Kementerian|Ministry|Pejabat|Majlis|Council|MARA|SDEC|SDIH|PERKESO|MEITD|FICORD|Pustaka|Lembaga|Premier|Negeri|Sarawak|Unit Audit|J-KOM|TEGAS|Municipal|Kerajaan|MDEC|Perdana Menteri|Setiausaha/i },
+      { id: 'biz', label: 'Business & SMEs', hue: '#19e39b', icon: 'brief', test: /.*/ },
+    ];
+    const audOf = t => (AUDIENCE.find(f => f.test.test(`${t.title} ${t.org || ''}`)) || AUDIENCE[3]).id;
+    // a few titles were typed with a plain double hyphen; render it as a real dash
+    const dash = v => String(v).replace(/\s--\s/g, ' — ');
+    const tTagged = ordered.map(t => ({ ...t, title: dash(t.title), fam: audOf(t) }));
+    const AUD_ICON = {
+      globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 2.5 15 0 18M12 3c-2.5 2.6-2.5 15 0 18"/>',
+      cap: '<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.5 2.7 3 6 3s6-1.5 6-3v-5"/>',
+      building: '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2"/>',
+      brief: '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 12h18"/>',
+    };
+    const audIcon = k => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${AUD_ICON[k]}</svg>`;
+    const audCount = id => tTagged.filter(t => t.fam === id).length;
+
+    // Wires run from the bottom of the core down to the top of each node. The viewBox is stretched
+    // to the hub's box, so the stroke is kept honest with vector-effect="non-scaling-stroke".
+    const NODE_X = [12, 37.3, 62.7, 88];
+    const wires = AUDIENCE.map((f, i) => {
+      const x = NODE_X[i];
+      return `<path class="cat__wire" vector-effect="non-scaling-stroke" style="--hue:${f.hue};--i:${i}"
+        d="M50 46 C 50 ${58 + i % 2 * 4}, ${x} ${56 - Math.abs(50 - x) * .08}, ${x} 72" />`;
+    }).join('');
+
+    const E2 = C.engine || {};
+    const talksHTML = talks.length ? `
+      <section class="cat cat--talks" aria-labelledby="talks-h">
+        <div class="cat__head">
+          <p class="eyebrow">Talks &amp; trainings</p>
+          <h3 id="talks-h">${esc(E2.stat || talks.length)} delivered</h3>
+          <p class="cat__lede">${talks.length} on record here, across four kinds of room — from a village school hall to a ministry, a campus and an overseas client.</p>
+        </div>
+
+        <div class="cat__hub">
+          <svg class="cat__wires" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${wires}</svg>
+          <div class="cat__core">
+            <span class="cat__core-ring" aria-hidden="true"></span>
+            <b>${esc(E2.stat || talks.length)}</b><span>delivered</span>
+          </div>
+          <div class="cat__nodes" role="group" aria-label="Filter by audience">
+            ${AUDIENCE.map((f, i) => `<button class="cat__node" type="button" data-fam="${f.id}" aria-pressed="false" style="--hue:${f.hue};--i:${i}">
+              <span class="cat__node-ico">${audIcon(f.icon)}</span>
+              <span class="cat__node-txt"><b>${esc(f.label)}</b><em>${audCount(f.id)} sessions</em></span>
+            </button>`).join('')}
+          </div>
+        </div>
+
+        <ul class="cat__grid cat__grid--talks">${tTagged.map((t, i) => {
+          const f = AUDIENCE.find(x => x.id === t.fam);
+          const sub = [t.org, t.place, t.audience].filter(Boolean).map(esc).join(' \u00b7 ');
+          return `<li class="cat__item" data-fam="${t.fam}" style="--hue:${f.hue};--i:${i % 12}">
+            <article class="cat__card cat__card--flat">
+              <span class="cat__ico">${audIcon(f.icon)}</span>
+              <span class="cat__sum">
+                <b>${esc(t.title)}</b>
+                ${sub ? `<em>${sub}</em>` : ''}
+              </span>
+            </article>
+          </li>`;
+        }).join('')}</ul>
+        <p class="cat__empty" hidden>Nothing on record for that audience.</p>
+        <div class="cat__more-wrap"><button class="cat__more" type="button" aria-expanded="false">Show all ${talks.length}</button></div>
+      </section>` : '';
+
     // Training catalogue: what he can be booked to deliver, as a hub feeding four families of
     // programme. Clicking a family node filters the grid; each card opens its own syllabus.
     const T = DATA.training || {}, progs = T.programmes || [];
@@ -792,15 +862,6 @@
     };
     const famIcon = k => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${FAM_ICON[k]}</svg>`;
 
-    // Wires run from the bottom of the core down to the top of each node. The viewBox is stretched
-    // to the hub's box, so the stroke is kept honest with vector-effect="non-scaling-stroke".
-    const NODE_X = [12, 37.3, 62.7, 88];
-    const wires = FAMILY.map((f, i) => {
-      const x = NODE_X[i];
-      return `<path class="cat__wire" vector-effect="non-scaling-stroke" style="--hue:${f.hue};--i:${i}"
-        d="M50 46 C 50 ${58 + i % 2 * 4}, ${x} ${56 - Math.abs(50 - x) * .08}, ${x} 72" />`;
-    }).join('');
-
     const detail = (lab, items) => items && items.length
       ? `<h5>${esc(lab)}</h5><ul>${items.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : '';
 
@@ -812,18 +873,11 @@
           <p class="cat__lede">Built and delivered by Dr. Rahmat — ${tagged.reduce((n, p2) => n + p2.topics.length, 0)} topics across four families, for groups of ${esc(progs[0].pax || '20 - 30')}.</p>
         </div>
 
-        <div class="cat__hub">
-          <svg class="cat__wires" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${wires}</svg>
-          <div class="cat__core">
-            <span class="cat__core-ring" aria-hidden="true"></span>
-            <b>${progs.length}</b><span>programmes</span>
-          </div>
-          <div class="cat__nodes" role="group" aria-label="Filter by family">
-            ${FAMILY.map((f, i) => `<button class="cat__node" type="button" data-fam="${f.id}" aria-pressed="false" style="--hue:${f.hue};--i:${i}">
-              <span class="cat__node-ico">${famIcon(f.icon)}</span>
-              <span class="cat__node-txt"><b>${esc(f.label)}</b><em>${famCount(f.id)} programmes</em></span>
-            </button>`).join('')}
-          </div>
+        <div class="cat__nodes cat__nodes--row" role="group" aria-label="Filter by family">
+          ${FAMILY.map((f, i) => `<button class="cat__node" type="button" data-fam="${f.id}" aria-pressed="false" style="--hue:${f.hue};--i:${i}">
+            <span class="cat__node-ico">${famIcon(f.icon)}</span>
+            <span class="cat__node-txt"><b>${esc(f.label)}</b><em>${famCount(f.id)} programmes</em></span>
+          </button>`).join('')}
         </div>
 
         <ul class="cat__grid">${tagged.map((p2, i) => {
@@ -846,18 +900,6 @@
         ${T.audience && T.audience.length ? `<p class="cat__aud"><b>Who it is for</b> ${T.audience.map(esc).join(' \u00b7 ')}</p>` : ''}
       </section>` : '';
 
-    const LEAD = 10;
-    const ordered = [...upcoming, ...past];
-    const talksHTML = talks.length ? `
-      <div class="talks">
-        <div class="talks__head">
-          <h3>Talks &amp; trainings</h3>
-          <p class="muted small"><b>${E.stat || talks.length}</b> delivered · ${talks.length} on record here</p>
-        </div>
-        <ol class="talks__list">${ordered.slice(0, LEAD).map(talkLI).join('')}</ol>
-        <ol class="talks__list talks__list--more" hidden>${ordered.slice(LEAD).map(talkLI).join('')}</ol>
-        ${ordered.length > LEAD ? `<button class="btn btn--ghost talks__more" type="button" aria-expanded="false">Show all ${ordered.length}</button>` : ''}
-      </div>` : '';
 
     const bars = (n, seed) => Array.from({ length: n }, (_, i) =>
       `<i style="--h:${28 + ((seed * 7 + i * 31) % 64)}%;--i:${i}"></i>`).join('');
@@ -963,49 +1005,58 @@
       orbit.addEventListener('pointerleave', () => { px = 0; py = 0; });
     }
 
-    // Family filter. Nothing here hides a card by default: without JS every card stays visible.
-    const cat = el.querySelector('.cat');
-    if (cat) {
-      const items = [...cat.querySelectorAll('.cat__item')];
-      const nodes = [...cat.querySelectorAll('.cat__node')];
-      const empty = cat.querySelector('.cat__empty');
-      let active = null;
+    // Both boards behave the same: family nodes filter the grid, and a grid with a "show all"
+    // button starts clipped. Nothing here hides a card by default — without JS every card is
+    // visible and the button simply does nothing.
+    el.querySelectorAll('.cat').forEach(board => {
+      const items = [...board.querySelectorAll('.cat__item')];
+      const nodes = [...board.querySelectorAll('.cat__node')];
+      const empty = board.querySelector('.cat__empty');
+      const more = board.querySelector('.cat__more');
+      const LEAD = 12;
+      const clips = !!more; // only a board with a "show all" button may hide part of its grid
+      let active = null, expanded = false;
+
       const apply = () => {
         let shown = 0;
         items.forEach(li => {
-          const on = !active || li.dataset.fam === active;
+          const match = !active || li.dataset.fam === active;
+          // a family view shows everything in it; an unfiltered clipping grid starts at LEAD
+          const on = match && (!clips || active || expanded || shown < LEAD);
+          if (match) shown++;
           li.classList.toggle('is-out', !on);
-          shown += on;
         });
         nodes.forEach(n => {
           const on = n.dataset.fam === active;
           n.classList.toggle('is-active', on);
           n.setAttribute('aria-pressed', String(on));
         });
-        cat.classList.toggle('is-filtered', !!active);
         empty.hidden = shown > 0;
+        if (more) {
+          more.hidden = !!active || shown <= LEAD;
+          more.textContent = expanded ? 'Show fewer' : `Show all ${shown}`;
+          more.setAttribute('aria-expanded', String(expanded));
+        }
         refreshSoon();
       };
+
       nodes.forEach(n => n.addEventListener('click', () => {
         active = active === n.dataset.fam ? null : n.dataset.fam;
         apply();
       }));
+      more && more.addEventListener('click', () => {
+        expanded = !expanded;
+        apply();
+        if (!expanded) board.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+      });
+      apply();
+
       // entrance is transform-only, so a card is never hidden by a missed callback
       new IntersectionObserver(([e], io) => {
-        if (!e.isIntersecting) return; io.disconnect(); cat.classList.add('is-in');
-      }, { threshold: .08 }).observe(cat);
-    }
-
-    const more = el.querySelector('.talks__more'), rest = el.querySelector('.talks__list--more');
-    more && more.addEventListener('click', () => {
-      const open = rest.hidden;
-      rest.hidden = !open;
-      more.setAttribute('aria-expanded', String(open));
-      more.textContent = open ? 'Show fewer' : `Show all ${ordered.length}`;
-      if (!open) el.querySelector('.talks').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
-      refreshSoon();
+        if (!e.isIntersecting) return; io.disconnect(); board.classList.add('is-in');
+      }, { threshold: .08 }).observe(board);
     });
-  }
+}
 
   // ---------- contact ----------
   const telHref = phone => {
