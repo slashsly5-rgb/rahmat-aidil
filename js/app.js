@@ -802,7 +802,7 @@
 
     const E2 = C.engine || {};
     const talksHTML = talks.length ? `
-      <section class="cat cat--talks" aria-labelledby="talks-h">
+      <section class="cat cat--talks" id="talks" aria-labelledby="talks-h">
         <div class="cat__head">
           <p class="eyebrow">Talks &amp; trainings</p>
           <h3 id="talks-h">${esc(E2.stat || talks.length)} delivered</h3>
@@ -869,7 +869,7 @@
       ? `<h5>${esc(lab)}</h5><ul>${items.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : '';
 
     const catalogueHTML = progs.length ? `
-      <section class="cat" aria-labelledby="cat-h">
+      <section class="cat" id="programmes" aria-labelledby="cat-h">
         <div class="cat__head">
           <p class="eyebrow">Training programmes</p>
           <h3 id="cat-h">${progs.length} programmes, ready to run</h3>

@@ -116,10 +116,12 @@ a { color: inherit; text-decoration: none; }
 .poster.is-in .trend__line path { stroke-dashoffset: 0; }
 
 /* reactions */
-.reacts { display: flex; gap: 1.2cqw; font-size: 1.15cqw; }
-.reacts > span { display: inline-flex; align-items: center; gap: .5cqw; padding: .7cqw 1.1cqw; border-radius: .9cqw; background: rgba(0, 0, 0, .35); border: 1px solid rgba(245, 197, 66, .3); }
+.reacts { display: flex; flex-wrap: nowrap; gap: .55cqw; font-size: 1cqw; }
+.reacts > :where(span, a) { white-space: nowrap; display: inline-flex; align-items: center; gap: .35cqw; padding: .6cqw .8cqw; border-radius: .9cqw; background: rgba(0, 0, 0, .35); border: 1px solid rgba(245, 197, 66, .3); }
 .reacts--one { padding: 0; font-size: 1.5cqw; }
-.reacts svg { width: 1.7cqw; height: 1.7cqw; fill: var(--gold); stroke: none; filter: drop-shadow(0 0 .5cqw var(--gold)); }
+.reacts > a { transition: border-color .2s ease, transform .2s ease; }
+.reacts > a:hover { border-color: var(--gold); transform: translateY(-2px); }
+.reacts svg { width: 1.4cqw; height: 1.4cqw; fill: var(--gold); stroke: none; filter: drop-shadow(0 0 .5cqw var(--gold)); }
 
 /* facebook badge */
 .p--fb { background: none; border: none; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; padding: 0; aspect-ratio: 1; }
@@ -201,7 +203,7 @@ a { color: inherit; text-decoration: none; }
   .bar { grid-template-columns: 90px 1fr 36px; } .bar__track { height: 6px; }
   .donut { width: 72px; height: 72px; }
   .trend { grid-template-columns: 1fr 72px; }
-  .reacts > span { padding: 8px 12px; } .reacts--one { font-size: 18px; }
+  .reacts > :where(span, a) { padding: 8px 12px; } .reacts--one { font-size: 18px; }
   .p--fb { display: none; } /* footer carries the Facebook link on phones */
   .p--profile > span:not(.p__top) { max-width: none; }
   .p__top { gap: 8px; margin-bottom: 12px; }

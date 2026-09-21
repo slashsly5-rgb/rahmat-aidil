@@ -19,6 +19,7 @@
   const creds = ((D.credentials && D.credentials.credentials) || []).filter(c => c.year);
   const talks = (P.stats || []).find(s => /talks/i.test(s.label)); // '500+'
   const talksStat = talks ? talks.value : '500+';
+  const progs = (D.training && D.training.programmes) || [];
   const main = sup.filter(s => s.role !== 'Co-supervisor').length, co = sup.length - main;
   const now = (P.now || [])[0];
   const c = P.contact || {};
@@ -26,7 +27,7 @@
   // Panel positions as % of the 4:5 poster (x = left edge, y = top edge, w = width). Tune here if the scene changes.
   const POS = {
     profile: { x: 3, y: 2.5, w: 60 },   dash: { x: 67, y: 4, w: 30 },       insights: { x: 67, y: 25, w: 30 },
-    recog: { x: 67, y: 40, w: 30 },      trend: { x: 67, y: 51, w: 30 },     reacts: { x: 67, y: 61.5, w: 30 },
+    recog: { x: 67, y: 40, w: 30 },      trend: { x: 67, y: 51, w: 30 },     reacts: { x: 67, y: 61.5, w: 31 },
     collab: { x: 67, y: 67, w: 30 },     fb: { x: 83, y: 76.5, w: 12 },      msg: { x: 67, y: 88, w: 30 },
     builds: { x: 3, y: 40, w: 31 },      toolbox: { x: 3, y: 61.5, w: 23 },   growth: { x: 3, y: 78.5, w: 27 },
   };
@@ -127,8 +128,14 @@
     <svg class="trend__line" viewBox="0 0 80 40"><path d="M2 34 L18 26 L32 30 L48 16 L62 20 L78 6"/><path d="M66 6h12v12" class="trend__arrow"/></svg></span>`);
 
   // ---- reactions
-  const reacts = panel('reacts', SITE + '#credentials', `
-    <span class="reacts"><span>${I.heart}<b>${esc(talksStat)}</b></span><span>${I.chat}<b>${creds.length}</b> certs</span><span>${I.save}<b>${sup.length}</b></span></span>`, ' p--bare');
+  // each figure links to the board it comes from, not just to the section
+  const reacts = `<span class="p p--reacts p--bare" style="${at('reacts')}">
+    <span class="reacts">
+      <a href="${SITE}#talks">${I.heart}<b>${esc(talksStat)}</b></a>
+      <a href="${SITE}#credentials">${I.chat}<b>${creds.length}</b> certs</a>
+      <a href="${SITE}#academic">${I.save}<b>${sup.length}</b></a>
+      ${progs.length ? `<a href="${SITE}#programmes">${I.book}<b>${progs.length}</b> courses</a>` : ''}
+    </span></span>`;
 
   // ---- collaboration request
   const collab = `<span class="p p--collab" style="${at('collab')}">
@@ -200,6 +207,12 @@
   requestAnimationFrame(() => document.getElementById('poster').classList.add('is-in'));
   if (!reduced) ui.querySelectorAll('[data-count]').forEach((n, i) => {
     const to = +n.dataset.count, t0 = performance.now() + 500 + i * 150;
-    (function tick(now) { const k = Math.min(1, Math.max(0, (now - t0) / 1000)); n.textContent = Math.round(to * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(tick); })(t0);
+    requestAnimationFrame(function tick(now) {
+      // hold the real number until the count-up starts; calling this synchronously wrote 0
+      if (now < t0) { requestAnimationFrame(tick); return; }
+      const k = Math.min(1, (now - t0) / 1000);
+      n.textContent = Math.round(to * (1 - Math.pow(1 - k, 3)));
+      if (k < 1) requestAnimationFrame(tick);
+    });
   });
 })();
