@@ -710,7 +710,7 @@
   const ORBIT = [
     { x: 4, y: 9, w: 27, rot: 15, d: 1.05, z: 4, face: 'transport' },
     { x: 57, y: 6, w: 28, rot: -16, d: 0.80, z: 4, face: 'wave' },
-    { x: -2, y: 30, w: 26, rot: 19, d: 1.28, z: 4, face: 'wave' },
+    { x: 2, y: 30, w: 26, rot: 19, d: 1.28, z: 4, face: 'wave' },
     { x: 68, y: 25, w: 27, rot: -13, d: 0.92, z: 4, face: 'transport' },
     { x: 7, y: 54, w: 29, rot: 12, d: 1.18, z: 4, face: 'transport' },
     { x: 62, y: 49, w: 28, rot: -17, d: 1.32, z: 4, face: 'wave' },
@@ -861,10 +861,10 @@
       ${talksHTML}`;
 
     const orbit = el.querySelector('.orbit'), space = el.querySelector('.orbit__space');
-    new IntersectionObserver(([e], io) => {
-      if (!e.isIntersecting) return; io.disconnect();
-      orbit.classList.add('is-in');
-    }, { threshold: .2 }).observe(orbit);
+    // Marked in-view immediately, not on an IntersectionObserver. The observer does not fire in a
+    // tab that is not rendering (backgrounded, occluded), and this class gates the cards' opacity:
+    // when it never arrived the whole stage stayed blank and frozen.
+    orbit.classList.add('is-in');
 
     // Pointer parallax: the stage keeps --px/--py in the -1..1 range, each card multiplies by its depth.
     if (!reduced && matchMedia('(hover: hover)').matches) {
