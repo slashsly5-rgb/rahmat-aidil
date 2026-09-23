@@ -17,6 +17,7 @@ a { color: inherit; text-decoration: none; }
 .poster__scene, .poster__figure { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .poster__figure { z-index: 3; pointer-events: none; }
 .poster__ui { position: absolute; inset: 0; z-index: 2; }
+.poster__scenebox { display: contents; } /* desktop: no box, the light layers position against the poster; phones turn it into the scene box */
 .poster__sparks { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
 .poster__sparks i { position: absolute; width: .5cqw; height: .5cqw; border-radius: 50%; background: var(--gold-2); box-shadow: 0 0 1cqw var(--gold); opacity: 0; transform: scale(var(--s)); animation: twinkle 4s ease-in-out var(--d) infinite; }
 @keyframes twinkle { 0%, 100% { opacity: 0; } 50% { opacity: .9; } }
@@ -212,8 +213,8 @@ a { color: inherit; text-decoration: none; }
 /* ---- phones: panels flow in a column under the scene (figure stays in the scene image) ---- */
 @media (max-width: 700px) {
   .poster { overflow: visible; box-shadow: none; border-radius: 0; width: 100%; aspect-ratio: auto; }
-  .poster__scene { position: relative; inset: auto; width: 100%; height: auto; border-radius: 18px; }
-  .poster__figure, .poster__sparks, .poster__stage, .poster__bg { display: none; }
+  .poster__scenebox { display: block; position: relative; border-radius: 18px; overflow: hidden; isolation: isolate; }
+  .poster__scene { position: relative; inset: auto; width: 100%; height: auto; }
   .poster__ui { position: relative; inset: auto; display: grid; gap: 12px; margin-top: 14px; }
   .p { position: static; width: auto !important; left: auto !important; top: auto !important; font-size: 14px; padding: 14px 16px; border-radius: 14px; }
   .p small, .p em, .bar, .bar em, .bar b, .donut__legend, .thumb small, .growth__axis { font-size: 12px; }
