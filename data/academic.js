@@ -97,6 +97,8 @@ window.DATA.academic = {
     // Added 2026-09-19 from the OCULUS postgraduate supervisor list (owner-supplied screenshot).
     // Titles not registered yet; add a `title:` line when known. No names here: public site.
     { level: 'PhD', status: 'Ongoing', role: 'Main supervisor', areas: [] },
+    // Added 2026-09-28: owner confirmed 10 PhD students as main (primary) supervisor.
+    { level: 'PhD', status: 'Ongoing', role: 'Main supervisor', areas: [] },
     { level: 'PhD', status: 'Ongoing', role: 'Co-supervisor', areas: [] },
     // Master's candidates listed in the 2025 UTS appraisal; titles not registered yet.
     { level: 'Master', status: 'Ongoing', role: 'Main supervisor', areas: [] },
