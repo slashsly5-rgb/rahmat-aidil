@@ -1,7 +1,7 @@
 // site/resume/resume.js — digital-resume poster: floating gold glass panels around the seated figure.
 // Every panel is a link into the main site. Data comes from ../data/*.js (nothing duplicated here).
 (function () {
-  const { esc, countBy, slug } = window.LIB;
+  const { esc, countBy, slug, activeNow } = window.LIB;
   const D = window.DATA || {};
   const P = D.profile, ui = document.getElementById('ui');
   if (!P || !ui) return;
@@ -21,15 +21,15 @@
   const talksStat = talks ? talks.value : '500+';
   const progs = (D.training && D.training.programmes) || [];
   const main = sup.filter(s => s.role !== 'Co-supervisor').length, co = sup.length - main;
-  const now = (P.now || [])[0];
+  const now = activeNow(P.now || [])[0]; // skip items whose `until` has passed
   const c = P.contact || {};
 
   // Panel positions as % of the 4:5 poster (x = left edge, y = top edge, w = width). Tune here if the scene changes.
   const POS = {
     profile: { x: 3, y: 2.5, w: 60 },   dash: { x: 67, y: 4, w: 30 },       insights: { x: 67, y: 25, w: 30 },
     recog: { x: 67, y: 40, w: 30 },      trend: { x: 67, y: 51, w: 30 },     reacts: { x: 67, y: 61.5, w: 31 },
-    collab: { x: 67, y: 67, w: 30 },     fb: { x: 83, y: 76.5, w: 12 },      msg: { x: 67, y: 88, w: 30 },
-    builds: { x: 3, y: 40, w: 31 },      toolbox: { x: 3, y: 61.5, w: 23 },   growth: { x: 3, y: 78.5, w: 27 },
+    collab: { x: 71, y: 67, w: 26 },     fb: { x: 83, y: 76.5, w: 12 },      msg: { x: 67, y: 88, w: 30 },
+    builds: { x: 3, y: 40, w: 31 },      toolbox: { x: 3, y: 78, w: 30 },     growth: { x: 35, y: 81, w: 26 },
   };
   const at = k => `left:${POS[k].x}%;top:${POS[k].y}%;width:${POS[k].w}%`;
   const panel = (k, href, body, extra = '') => `<a class="p p--${k}${extra}" style="${at(k)}" href="${esc(href)}"${/^https?:/.test(href) ? ' rel="noopener" target="_blank"' : ''}>${body}</a>`;
@@ -66,7 +66,10 @@
   const profile = `<div class="p p--profile" style="${at('profile')}">
     <span class="p__top">
       <span class="p__brand">${I.fb}<b>facebook</b></span>
-      ${P.cv ? `<a class="b b--gold b--dl" href="${SITE}${esc(P.cv)}" download>${I.dl}Download Profile</a>` : ''}
+      <span class="p__dls">
+        <a class="b b--dl b--photo" href="${SITE}cv/Rahmat-Aidil-Photo.jpg" download><img src="photo-thumb.jpg" alt="">Download Photo</a>
+        ${P.cv ? `<a class="b b--gold b--dl" href="${SITE}${esc(P.cv)}" download>${I.dl}Download Profile</a>` : ''}
+      </span>
     </span>
     <span class="prof">
       <span class="prof__avatar"><img src="${AV}" alt=""></span>
@@ -87,6 +90,7 @@
       <a class="b b--gold" href="${SITE}">Visit site</a>
       ${c.phone ? `<a class="b b--wa" href="${waHref(c.phone)}" rel="noopener" target="_blank">${I.wa}Message</a>` : ''}
       ${c.email ? `<a class="b b--sq" href="${mailHref(c.email)}" aria-label="Email">${I.mail}</a>` : ''}
+      <a class="b b--vcf" href="${SITE}cv/Rahmat-Aidil.vcf" download>Save contact</a>
     </span></div>`;
 
   // ---- professional dashboard
