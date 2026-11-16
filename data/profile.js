@@ -26,5 +26,5 @@ window.DATA.profile = {
     { text: 'Leading digital transformation at UTS as Acting Chief Digital Officer' },
   ],
   contact: { phone: '016-772 5496', email: 'slydil@uts.edu.my', linkedin: 'https://www.linkedin.com/in/rahmat-aidil-djubair-262778375/' },
-  cv: 'cv/Rahmat-Aidil-Profile.pdf',
+  cv: 'cv/Rahmat-Aidil-Profile.pdf?v=20261116',
 };

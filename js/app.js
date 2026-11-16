@@ -137,7 +137,7 @@
         </div>
         ${roles.map(win).join('')}
       </div>
-      <p class="cw__note muted small">Full career history is in the <a href="cv/Rahmat-Aidil-Profile.pdf" download>profile</a>.</p>
+      <p class="cw__note muted small">Full career history is in the <a href="cv/Rahmat-Aidil-Profile.pdf?v=20261116" download>profile</a>.</p>
     </div>`;
 
     // Cables: bezier from each window's inner edge to the painted core, drawn from live rects.
