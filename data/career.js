@@ -90,6 +90,12 @@ window.DATA.career = {
       end: '2026',
     },
     {
+      title: 'Pengurus Pusat Bertauliah (Accredited Centre Manager), L02707',
+      org: 'Centre of Skills and TVET (COST), University of Technology Sarawak',
+      start: '2026-10',
+      end: 'Present',
+    },
+    {
       title: 'ELITE@UM Fellow',
       org: 'Universiti Malaya',
       start: '2025-10',

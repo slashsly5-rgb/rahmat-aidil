@@ -48,6 +48,13 @@ window.DATA.credentials = {
       code: 'L02707',
     },
     {
+      title: 'Pengurus Pusat Bertauliah (Accredited Centre Manager), L02707, Centre of Skills and TVET (COST), UTS',
+      short: 'PPB · Accredited Centre Manager', org: 'JPK · COST UTS', icon: 'shield',
+      issuer: 'Jabatan Pembangunan Kemahiran, Kementerian Sumber Manusia',
+      year: '2026',
+      code: 'L02707',
+    },
+    {
       title: 'ELITE@UM Fellow',
       issuer: 'Universiti Malaya',
     },

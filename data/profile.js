@@ -13,6 +13,7 @@ window.DATA.profile = {
     'Acting Chief Digital Officer · UTS',
     'Chief AI Advisor · Blackstone Intelligence',
     'DKM Level 4 · Pengajaran TVET (JPK)',
+    'Pengurus Pusat Bertauliah · COST UTS (JPK)',
   ],
   stats: [
     { label: 'Deployed AI platforms', value: 'count:projects.platforms' },
