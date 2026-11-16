@@ -90,8 +90,10 @@ window.DATA.career = {
       end: '2026',
     },
     {
-      title: 'ELITE@UM Expert',
+      title: 'ELITE@UM Fellow',
       org: 'Universiti Malaya',
+      start: '2025-10',
+      end: '2027-10',
     },
     {
       title: 'Honorary Adjunct Faculty',

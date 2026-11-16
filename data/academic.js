@@ -1,9 +1,9 @@
 window.DATA = window.DATA || {};
 window.DATA.academic = {
   recognition: {
-    title: 'ELITE@UM Expert',
+    title: 'ELITE@UM Fellow',
     issuer: 'Universiti Malaya',
-    text: 'Appointed and recognised as an ELITE@UM Expert by Universiti Malaya, acknowledging his standing as a subject-matter expert in Artificial Intelligence, AI system development and digital transformation, and his contribution to bridging academia and industry through applied AI.',
+    text: 'Appointed ELITE@UM Fellow (Experiential Learning by Industry and Technocrat) by Universiti Malaya for October 2025 to October 2027, with the Department of East Asian Studies, Faculty of Arts and Social Sciences, recognising his standing in Artificial Intelligence, AI system development and digital transformation, and his contribution to bridging academia and industry through applied AI.',
   },
   areas: [
     { id: 'ai-adoption', label: 'AI adoption' },

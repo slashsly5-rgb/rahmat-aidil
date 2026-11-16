@@ -120,7 +120,7 @@
   const recog = panel('recog', SITE + '#credentials', `
     <span class="p__head">Content performance<i>${seeAll}</i></span>
     <span class="tiles tiles--3">
-      <span class="tile"><small>Expert</small><b>ELITE@UM</b><em>Universiti Malaya</em></span>
+      <span class="tile"><small>Fellow</small><b>ELITE@UM</b><em>Universiti Malaya</em></span>
       <span class="tile"><small>TVET</small><b>DKM L4</b><em>Pengajaran TVET</em></span>
       <span class="tile"><small>Trainer</small><b>HRDF</b><em>certified</em></span>
     </span>`);

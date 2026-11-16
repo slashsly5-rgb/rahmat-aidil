@@ -48,7 +48,7 @@ window.DATA.credentials = {
       code: 'L02707',
     },
     {
-      title: 'ELITE@UM Expert',
+      title: 'ELITE@UM Fellow',
       issuer: 'Universiti Malaya',
     },
   ],
